@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
+
 
 @TeleOp(name="ServoTest", group="Test")
 public class ServoTest extends LinearOpMode {
@@ -10,8 +12,7 @@ public class ServoTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         servo = hardwareMap.servo.get("servo");
-        crservo1 = hardwareMap.crservo.get("servo1");
-        crservo2 = hardwareMap.crservo.get("servo2");
+
 
         while(!opModeIsActive()){
 
@@ -20,7 +21,6 @@ public class ServoTest extends LinearOpMode {
         while(opModeIsActive()){
             servoAdjust();
             servoToLimits();
-            servoRun();
             telemetry.addData("Servo Pos", servo.getPosition());
             telemetry.update();
         }

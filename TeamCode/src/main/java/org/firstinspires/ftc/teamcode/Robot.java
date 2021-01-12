@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-public class robot{
+class Robot{
     //////////////////
     /* DECLARATIONS */
     //////////////////
@@ -29,7 +29,7 @@ public class robot{
     HardwareMap hwMap           =  null;
 
     /* Constructor */
-    public robot(){
+    public void robot (){
     }
 
     /* Initialize standard Hardware interfaces */

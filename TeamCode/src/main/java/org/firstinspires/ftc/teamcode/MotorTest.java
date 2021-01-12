@@ -39,7 +39,7 @@ public class MotorTest extends LinearOpMode{
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             intake();
-            motorPower
+            motorPower();
             // Show the elapsed game time and wheel power.
             telemetry.update();
         }

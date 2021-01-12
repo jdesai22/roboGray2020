@@ -3,15 +3,28 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.ToggleMap;
+import org.firstinspires.ftc.teamcode.UseMap;
+
 
 @TeleOp(name="DriveEncoderFinder", group="main")
 public class DriveEncoderFinder extends LinearOpMode {
-    robot robo = new robot();
-    toggleMap toggleMap1 = new toggleMap();
-    useMap useMap1 = new useMap();
+    Robot robo = new Robot();
+    ToggleMap toggleMap1 = new ToggleMap();
+    UseMap useMap1 = new UseMap();
 
-    toggleMap toggleMap2 = new toggleMap();
-    useMap useMap2 = new useMap();
+    ToggleMap toggleMap2 = new ToggleMap();
+    UseMap useMap2 = new UseMap();
     ////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////
     /* V * A * R * I * A * B * E * S *////* V * A * R * I * A * B * E * S */
