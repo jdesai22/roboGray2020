@@ -20,5 +20,9 @@ repositories {
 
 dependencies {
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
-    implementation 'org.openftc:easyopencv:1.4.1'
+    implementation ('org.junit.jupiter:junit-jupiter-api:5.7.0')
+    implementation ('org.junit.jupiter:junit-jupiter-engine:5.7.0')
+    implementation ('org.openftc:easyopencv:1.4.1')
+    implementation project(path: ':openCVLibrary343')
+    compile project(':FtcRobotController')
 }

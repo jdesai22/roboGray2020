@@ -21,6 +21,11 @@ android {
     }
 }
 
+dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+    implementation project(path: ':openCVLibrary343')
+}
+
 repositories {
     maven { url = "https://dl.bintray.com/first-tech-challenge/ftcsdk/" }
 
