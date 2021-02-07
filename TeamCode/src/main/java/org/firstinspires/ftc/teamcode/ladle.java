@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-class Robot{
+public class ladle{
     //////////////////
     /* DECLARATIONS */
     //////////////////
@@ -23,13 +23,19 @@ class Robot{
     //INTAKE//
     public DcMotor intake      = null;
 
+    //LAUNCHER//
+    public DcMotor launcher    = null;
+
+    //PUSHER//
+    public Servo pusher      = null;
+
     //IMU//
     BNO055IMU imu;
 
     HardwareMap hwMap           =  null;
 
     /* Constructor */
-    public void robot (){
+    public void ladle (){
     }
 
     /* Initialize standard Hardware interfaces */
@@ -57,6 +63,16 @@ class Robot{
         intake.setDirection(DcMotor.Direction.FORWARD);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+
+        //Launcher//
+        launcher = hwMap.dcMotor.get("launcher");
+        launcher.setDirection(DcMotor.Direction.REVERSE);
+        launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //PUSHER//
+        pusher = hwMap.servo.get("pusher");
+
 
         //IMU//
         imu = hwMap.get(BNO055IMU.class, "imu");

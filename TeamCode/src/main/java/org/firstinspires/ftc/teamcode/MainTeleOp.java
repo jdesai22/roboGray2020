@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="MainTeleOp", group="main")
 public class MainTeleOp extends LinearOpMode {
-    Robot robo = new Robot();
+    ladle robo = new ladle();
 
     //    for controller 1
     ToggleMap toggleMap1 = new ToggleMap();
@@ -42,7 +42,9 @@ public class MainTeleOp extends LinearOpMode {
         //Check if slides hold position when transitioned
         double startTime = 0;
 
-        while(!opModeIsActive()){
+        waitForStart();
+
+        while(!opModeIsActive()) {
 
             resetEncoders();
             telemetry.update();
@@ -52,7 +54,20 @@ public class MainTeleOp extends LinearOpMode {
         while(opModeIsActive()){
             updateKeys();
             drive();
+            push();
+            launch();
+            intake();
+
             resetEncoders();
+
+            telemetry.addData("Push Pos", robo.pusher.getPosition());
+            telemetry.addData("Launch Power", robo.launcher.getPower());
+            telemetry.addData("Intake Power", robo.intake.getPower());
+            telemetry.addData("Back Left", robo.backLeft.getCurrentPosition());
+            telemetry.addData("Front Left", robo.frontLeft.getCurrentPosition());
+            telemetry.addData("Back Right", robo.backRight.getCurrentPosition());
+            telemetry.addData("Front Right", robo.frontRight.getCurrentPosition());
+
             telemetry.update();
         }
     }
@@ -121,7 +136,35 @@ public class MainTeleOp extends LinearOpMode {
 
     }
 
+    public void push() {
+//        make sure toggle works
+        if(toggleMap1.b){
+            robo.pusher.setPosition(1);
+        }
+        else {
+            robo.pusher.setPosition(0.5);
+        }
+    }
 
+    public void launch() {
+//        check
+        if(toggleMap1.a) {
+            robo.launcher.setPower(1);
+        } else if (toggleMap1.x){
+            robo.launcher.setPower(0);
+        }
+    }
+
+    public void intake() {
+//        check
+        if (toggleMap1.left_bumper) {
+            robo.intake.setPower(1);
+        } else if (toggleMap1.right_bumper){
+            robo.intake.setPower(-1);
+        } else {
+            robo.intake.setPower(0);
+        }
+    }
 
     public void resetEncoders(){
         if(gamepad2.y && gamepad2.b){
@@ -160,6 +203,16 @@ public class MainTeleOp extends LinearOpMode {
         if(gamepad1.b && cdCheck(useMap1.b, 500)){
             toggleMap1.b = toggle(toggleMap1.b);
             useMap1.b = runtime.milliseconds();
+            toggleMap1.b = false;
+        }
+        if(gamepad1.a && cdCheck(useMap1.a, 500)){
+            toggleMap1.a = toggle(toggleMap1.a);
+            useMap1.a = runtime.milliseconds();
+            toggleMap1.a = false;
+        }
+        if(gamepad1.x && cdCheck(useMap1.x, 500)){
+            toggleMap1.x = toggle(toggleMap1.x);
+            useMap1.x = runtime.milliseconds();
             toggleMap1.x = false;
         }
         if(gamepad2.left_bumper){
