@@ -21,7 +21,8 @@ public class ladle{
     public DcMotor frontRight  = null;
 
     //INTAKE//
-    public DcMotor intake      = null;
+    public DcMotor intake1      = null;
+    public DcMotor intake2      = null;
 
     //LAUNCHER//
     public DcMotor launcher    = null;
@@ -58,10 +59,14 @@ public class ladle{
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        //INTAKE//
-        intake = hwMap.dcMotor.get("intake");
-        intake.setDirection(DcMotor.Direction.FORWARD);
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //INTAKE// check forward and reverse
+        intake1 = hwMap.dcMotor.get("intake1");
+        intake1.setDirection(DcMotor.Direction.FORWARD);
+        intake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        intake2 = hwMap.dcMotor.get("intake2");
+        intake2.setDirection(DcMotor.Direction.FORWARD);
+        intake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         //Launcher//

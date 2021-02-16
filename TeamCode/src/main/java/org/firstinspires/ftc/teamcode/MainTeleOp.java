@@ -31,7 +31,11 @@ public class MainTeleOp extends LinearOpMode {
 
     //int chungoidPos = 0;
     private ElapsedTime runtime = new ElapsedTime();
+    public ElapsedTime launchTime = new ElapsedTime();
 
+//    VARIABLES
+    double launchBuffer = 0.5;
+    boolean launcherRunning = false;
 
     @Override
     public void runOpMode(){
@@ -62,7 +66,8 @@ public class MainTeleOp extends LinearOpMode {
 
             telemetry.addData("Push Pos", robo.pusher.getPosition());
             telemetry.addData("Launch Power", robo.launcher.getPower());
-            telemetry.addData("Intake Power", robo.intake.getPower());
+            telemetry.addData("Intake1 Power", robo.intake1.getPower());
+            telemetry.addData("Intake2 Power", robo.intake2.getPower());
             telemetry.addData("Back Left", robo.backLeft.getCurrentPosition());
             telemetry.addData("Front Left", robo.frontLeft.getCurrentPosition());
             telemetry.addData("Back Right", robo.backRight.getCurrentPosition());
@@ -138,10 +143,26 @@ public class MainTeleOp extends LinearOpMode {
 
     public void push() {
 //        make sure toggle works
-        if(toggleMap1.b){
-            robo.pusher.setPosition(1);
-        }
-        else {
+//        if(toggleMap1.b){
+//            robo.pusher.setPosition(1);
+//        }
+//        else {
+//            robo.pusher.setPosition(0.5);
+//        }
+
+//        better version - need to test
+
+//        if (launchTime.seconds() - launchTime.startTime() > launchBuffer && gamepad1.b && launcherRunning && robo.pusher.getPosition() == 0.5) {
+//            robo.pusher.setPosition(0.75);
+//            launchTime.reset();
+//        } else if (launchTime.seconds() - launchTime.startTime() > launchBuffer && robo.pusher.getPosition() == 0.75){
+//            robo.pusher.setPosition(0.5);
+//        }
+
+        if (launchTime.seconds() - launchTime.startTime() > launchBuffer && gamepad1.right_trigger > 0.1 && launcherRunning && robo.pusher.getPosition() == 0.5) {
+            robo.pusher.setPosition(0.75);
+            launchTime.reset();
+        } else if (launchTime.seconds() - launchTime.startTime() > launchBuffer && robo.pusher.getPosition() == 0.75){
             robo.pusher.setPosition(0.5);
         }
     }
@@ -150,19 +171,22 @@ public class MainTeleOp extends LinearOpMode {
 //        check
         if(toggleMap1.a) {
             robo.launcher.setPower(1);
+            launcherRunning = true;
         } else if (toggleMap1.x){
             robo.launcher.setPower(0);
+            launcherRunning = false;
         }
+
     }
 
     public void intake() {
 //        check
         if (toggleMap1.left_bumper) {
-            robo.intake.setPower(1);
+            robo.intake1.setPower(1);
         } else if (toggleMap1.right_bumper){
-            robo.intake.setPower(-1);
+            robo.intake1.setPower(-1);
         } else {
-            robo.intake.setPower(0);
+            robo.intake1.setPower(0);
         }
     }
 

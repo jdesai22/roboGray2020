@@ -12,14 +12,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.ladle;
 import org.firstinspires.ftc.teamcode.ToggleMap;
 import org.firstinspires.ftc.teamcode.UseMap;
 
 
 @TeleOp(name="DriveEncoderFinder", group="main")
 public class DriveEncoderFinder extends LinearOpMode {
-    Robot robo = new Robot();
+    ladle robo = new ladle();
     ToggleMap toggleMap1 = new ToggleMap();
     UseMap useMap1 = new UseMap();
 
