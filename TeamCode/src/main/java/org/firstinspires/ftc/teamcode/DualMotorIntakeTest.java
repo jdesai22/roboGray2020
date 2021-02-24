@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 
 @TeleOp(name="dualMotorTest", group="Test")
-public class dualMotorIntakeTest extends LinearOpMode{
+public class DualMotorIntakeTest extends LinearOpMode{
     private DcMotor intake1;
     private DcMotor intake2;
 
