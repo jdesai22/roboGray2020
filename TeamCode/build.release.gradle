@@ -10,6 +10,9 @@ dependencies {
     implementation 'com.acmerobotics.roadrunner:core:0.5.3'
 
     implementation 'com.acmerobotics.dashboard:dashboard:0.3.10'
+//    implementation('com.acmerobotics.dashboard:dashboard:0.4.0') {
+//        exclude group: 'org.firstinspires.ftc'
+//    }
 //    implementation 'com.noahbres.jotai:jotai:1.0.2'
 //    implementation('org.tensorflow:tensorflow-lite:0.0.0-nightly') { changing = true }
 //    implementation('org.tensorflow:tensorflow-lite-gpu:0.0.0-nightly') { changing = true }

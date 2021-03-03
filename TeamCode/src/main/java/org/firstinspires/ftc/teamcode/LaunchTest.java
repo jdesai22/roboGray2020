@@ -17,10 +17,13 @@ public class LaunchTest extends LinearOpMode {
 
     ElapsedTime launchTime = new ElapsedTime();
 
-
     //    VARIABLES
-    double launchBuffer = 0.5;
     boolean launcherRunning = false;
+
+//    tune these constants
+    double launchBuffer = 0.5;
+    double upServo = .5;
+    double bottomServo = .75;
 
     @Override
     public void runOpMode() {
@@ -51,11 +54,11 @@ public class LaunchTest extends LinearOpMode {
 //        else if(gamepad1.right_bumper){
 //            pusher.setPosition(0);
 //        }
-        if (launchTime.seconds() - launchTime.startTime() > launchBuffer && gamepad1.right_trigger > 0.1 && launcherRunning && pusher.getPosition() == 0.5) {
-            pusher.setPosition(0.75);
+        if (launchTime.seconds() - launchTime.startTime() > launchBuffer && gamepad1.right_trigger > 0.1 && launcherRunning && pusher.getPosition() == bottomServo) {
+            pusher.setPosition(upServo);
             launchTime.reset();
-        } else if (launchTime.seconds() - launchTime.startTime() > launchBuffer && pusher.getPosition() == 0.75){
-            pusher.setPosition(0.5);
+        } else if (launchTime.seconds() - launchTime.startTime() > launchBuffer && pusher.getPosition() == upServo){
+            pusher.setPosition(bottomServo);
         }
     }
 

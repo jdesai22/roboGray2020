@@ -3,23 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import org.firstinspires.ftc.teamcode.ladle;
-import org.firstinspires.ftc.teamcode.ToggleMap;
-import org.firstinspires.ftc.teamcode.UseMap;
 
 
 @TeleOp(name="DriveEncoderFinder", group="main")
 public class DriveEncoderFinder extends LinearOpMode {
-    ladle robo = new ladle();
+    Ladle robo = new Ladle();
     ToggleMap toggleMap1 = new ToggleMap();
     UseMap useMap1 = new UseMap();
 

@@ -3,18 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="MainTeleOp", group="main")
 public class MainTeleOp extends LinearOpMode {
-    ladle robo = new ladle();
+    Ladle robo = new Ladle();
 
     //    for controller 1
     ToggleMap toggleMap1 = new ToggleMap();
@@ -31,11 +23,15 @@ public class MainTeleOp extends LinearOpMode {
 
     //int chungoidPos = 0;
     private ElapsedTime runtime = new ElapsedTime();
-    public ElapsedTime launchTime = new ElapsedTime();
+//    public ElapsedTime launchTime = new ElapsedTime();
 
 //    VARIABLES
-    double launchBuffer = 0.5;
     boolean launcherRunning = false;
+
+    //    tune these constants
+    final int launchBuffer = 200;
+    final double upServo = .5;
+    final double bottomServo = 1;
 
     @Override
     public void runOpMode(){
@@ -43,7 +39,8 @@ public class MainTeleOp extends LinearOpMode {
         robo.imu();
 
         robo.runWithoutEncoderDrive();
-        //Check if slides hold position when transitioned
+
+
         double startTime = 0;
 
         waitForStart();
@@ -55,6 +52,7 @@ public class MainTeleOp extends LinearOpMode {
         }
 
         startTime = runtime.milliseconds();
+        robo.pusher.setPosition(bottomServo);
         while(opModeIsActive()){
             updateKeys();
             drive();
@@ -64,10 +62,6 @@ public class MainTeleOp extends LinearOpMode {
 
             resetEncoders();
 
-            telemetry.addData("Push Pos", robo.pusher.getPosition());
-            telemetry.addData("Launch Power", robo.launcher.getPower());
-            telemetry.addData("Intake1 Power", robo.intake1.getPower());
-            telemetry.addData("Intake2 Power", robo.intake2.getPower());
             telemetry.addData("Back Left", robo.backLeft.getCurrentPosition());
             telemetry.addData("Front Left", robo.frontLeft.getCurrentPosition());
             telemetry.addData("Back Right", robo.backRight.getCurrentPosition());
@@ -106,7 +100,7 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             pRot = -rotMultiplier*(gamepad1.right_trigger-gamepad1.left_trigger);
-            robo.mecanumDrive(pX, pY, pRot);
+            robo.mecanumDrive(pX, pY, -pRot);
         }
 
         else {
@@ -136,19 +130,19 @@ public class MainTeleOp extends LinearOpMode {
             pX = magnitude * Math.cos(modifiedTheta);
             pY = magnitude * Math.sin(modifiedTheta);
 
-            robo.mecanumDrive(pX, pY, pRot);
+            robo.mecanumDrive(pX, pY, -pRot);
         }
 
     }
 
     public void push() {
 //        make sure toggle works
-//        if(toggleMap1.b){
-//            robo.pusher.setPosition(1);
-//        }
-//        else {
-//            robo.pusher.setPosition(0.5);
-//        }
+        if(toggleMap1.right_bumper && toggleMap1.a){
+            robo.pusher.setPosition(upServo);
+        }
+        else {
+            robo.pusher.setPosition(bottomServo);
+        }
 
 //        better version - need to test
 
@@ -159,34 +153,59 @@ public class MainTeleOp extends LinearOpMode {
 //            robo.pusher.setPosition(0.5);
 //        }
 
-        if (launchTime.seconds() - launchTime.startTime() > launchBuffer && gamepad1.right_trigger > 0.1 && launcherRunning && robo.pusher.getPosition() == 0.5) {
-            robo.pusher.setPosition(0.75);
-            launchTime.reset();
-        } else if (launchTime.seconds() - launchTime.startTime() > launchBuffer && robo.pusher.getPosition() == 0.75){
-            robo.pusher.setPosition(0.5);
-        }
+//        if (launchTime.seconds() - launchTime.startTime() > launchBuffer && gamepad1.right_trigger > 0.1 && launcherRunning && robo.pusher.getPosition() == 0.5) {
+//            robo.pusher.setPosition(0.75);
+//            launchTime.reset();
+//        } else if (launchTime.seconds() - launchTime.startTime() > launchBuffer && robo.pusher.getPosition() == 0.75){
+//            robo.pusher.setPosition(0.5);
+//        }
+
+//        if (launchTime.seconds() - launchTime.startTime() > launchBuffer && gamepad1.right_bumper && launcherRunning && robo.pusher.getPosition() == bottomServo) {
+//            robo.pusher.setPosition(upServo);
+//            launchTime.reset();
+//            telemetry.addData("Pusher:", "UP");
+//        } else if (launchTime.seconds() - launchTime.startTime() > launchBuffer && robo.pusher.getPosition() == upServo){
+//            robo.pusher.setPosition(bottomServo);
+//            telemetry.addData("Pusher:", "DOWN");
+//        }
     }
 
     public void launch() {
 //        check
         if(toggleMap1.a) {
             robo.launcher.setPower(1);
-            launcherRunning = true;
-        } else if (toggleMap1.x){
+//            launcherRunning = true;
+            toggleMap1.x = false;
+            toggleMap1.y = false;
+            telemetry.addData("Launcher:", "RUNNING");
+        } else {
             robo.launcher.setPower(0);
-            launcherRunning = false;
+//            launcherRunning = false;
+            telemetry.addData("Launcher:", "REST");
         }
+//        } else if (toggleMap1.b){
+//            robo.launcher.setPower(0);
+//            launcherRunning = false;
+//            telemetry.addData("Launcher:", "STOPPED");
+//        }
 
     }
 
     public void intake() {
 //        check
-        if (toggleMap1.left_bumper) {
+        if (toggleMap1.x) {
             robo.intake1.setPower(1);
-        } else if (toggleMap1.right_bumper){
+            robo.intake2.setPower(1);
+            telemetry.addData("Intake:", "NORMAL");
+        } else if (toggleMap1.y){
             robo.intake1.setPower(-1);
+            robo.intake2.setPower(-1);
+            telemetry.addData("Intake:", "REVERSE");
         } else {
             robo.intake1.setPower(0);
+            robo.intake2.setPower(0);
+            telemetry.addData("Intake:", "REST");
+
         }
     }
 
@@ -217,32 +236,42 @@ public class MainTeleOp extends LinearOpMode {
         if(gamepad1.left_bumper && cdCheck(useMap1.left_bumper, 500)){
             toggleMap1.left_bumper = toggle(toggleMap1.left_bumper);
             useMap1.left_bumper = runtime.milliseconds();
-            toggleMap1.right_bumper = false;
+
         }
         if(gamepad1.right_bumper && cdCheck(useMap1.right_bumper, 500)){
             toggleMap1.right_bumper = toggle(toggleMap1.right_bumper);
             useMap1.right_bumper = runtime.milliseconds();
-            toggleMap1.left_bumper = false;
+//            toggleMap1.left_bumper = false;
         }
         if(gamepad1.b && cdCheck(useMap1.b, 500)){
             toggleMap1.b = toggle(toggleMap1.b);
             useMap1.b = runtime.milliseconds();
-            toggleMap1.b = false;
         }
         if(gamepad1.a && cdCheck(useMap1.a, 500)){
             toggleMap1.a = toggle(toggleMap1.a);
             useMap1.a = runtime.milliseconds();
-            toggleMap1.a = false;
         }
         if(gamepad1.x && cdCheck(useMap1.x, 500)){
             toggleMap1.x = toggle(toggleMap1.x);
             useMap1.x = runtime.milliseconds();
+            toggleMap1.y = false;
+        }
+        if(gamepad1.y && cdCheck(useMap1.y, 500)){
+            toggleMap1.y = toggle(toggleMap1.y);
+            useMap1.y = runtime.milliseconds();
             toggleMap1.x = false;
         }
-        if(gamepad2.left_bumper){
-            toggleMap1.left_bumper = false;
+//        test
+        if (toggleMap1.right_bumper && cdCheck(useMap1.right_bumper, launchBuffer)) {
             toggleMap1.right_bumper = false;
+            useMap1.right_bumper = runtime.milliseconds();
         }
+
+
+//        if(gamepad2.left_bumper){
+//            toggleMap1.left_bumper = false;
+//            toggleMap1.right_bumper = false;
+//        }
     }
 
     public boolean cdCheck(double key, int cdTime){
