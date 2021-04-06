@@ -23,15 +23,17 @@ public class MainTeleOp extends LinearOpMode {
 
     //int chungoidPos = 0;
     private ElapsedTime runtime = new ElapsedTime();
-//    public ElapsedTime launchTime = new ElapsedTime();
+    public ElapsedTime launchTime = new ElapsedTime();
 
 //    VARIABLES
     boolean launcherRunning = false;
+    boolean servoMoving = false;
 
     //    tune these constants
     final int launchBuffer = 200;
-    final double upServo = .5;
-    final double bottomServo = 1;
+    final double upServo = .4;
+    final double bottomServo = .657;
+    final boolean armOverride = false;
 
     @Override
     public void runOpMode(){
@@ -53,6 +55,7 @@ public class MainTeleOp extends LinearOpMode {
 
         startTime = runtime.milliseconds();
         robo.pusher.setPosition(bottomServo);
+        launchTime.reset();
         while(opModeIsActive()){
             updateKeys();
             drive();
@@ -61,6 +64,10 @@ public class MainTeleOp extends LinearOpMode {
             intake();
 
             resetEncoders();
+
+            if(!armOverride) {
+                robo.clearArmVoltage();
+            }
 
             telemetry.addData("Back Left", robo.backLeft.getCurrentPosition());
             telemetry.addData("Front Left", robo.frontLeft.getCurrentPosition());
@@ -137,11 +144,23 @@ public class MainTeleOp extends LinearOpMode {
 
     public void push() {
 //        make sure toggle works
-        if(toggleMap1.right_bumper && toggleMap1.a){
+//        if(toggleMap1.right_bumper && toggleMap1.a){
+//            robo.pusher.setPosition(upServo);
+//        }
+//        else {
+//            robo.pusher.setPosition(bottomServo);
+//        }
+
+        if (gamepad1.right_bumper && launchTime.milliseconds() >= 150 && !servoMoving && toggleMap1.a) {
             robo.pusher.setPosition(upServo);
+            servoMoving = true;
+            launchTime.reset();
         }
-        else {
+
+        if (launchTime.milliseconds() >= 150 && servoMoving) {
             robo.pusher.setPosition(bottomServo);
+            servoMoving = false;
+            launchTime.reset();
         }
 
 //        better version - need to test
@@ -175,8 +194,8 @@ public class MainTeleOp extends LinearOpMode {
         if(toggleMap1.a) {
             robo.launcher.setPower(1);
 //            launcherRunning = true;
-            toggleMap1.x = false;
-            toggleMap1.y = false;
+//            toggleMap1.x = false;
+//            toggleMap1.y = false;
             telemetry.addData("Launcher:", "RUNNING");
         } else {
             robo.launcher.setPower(0);
@@ -195,11 +214,11 @@ public class MainTeleOp extends LinearOpMode {
 //        check
         if (toggleMap1.x) {
             robo.intake1.setPower(1);
-            robo.intake2.setPower(1);
+            robo.intake2.setPower(.55);
             telemetry.addData("Intake:", "NORMAL");
         } else if (toggleMap1.y){
             robo.intake1.setPower(-1);
-            robo.intake2.setPower(-1);
+            robo.intake2.setPower(-.55);
             telemetry.addData("Intake:", "REVERSE");
         } else {
             robo.intake1.setPower(0);
