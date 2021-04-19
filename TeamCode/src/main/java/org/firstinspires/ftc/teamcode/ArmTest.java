@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -16,13 +17,14 @@ public class ArmTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-                intake = hardwareMap.dcMotor.get("arm");
-        servo = hardwareMap.servo.get("grasp");
+        intake = hardwareMap.dcMotor.get("arm");
+        servo = hardwareMap.servo.get("claw");
 
 
         intake.setDirection(DcMotor.Direction.FORWARD);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+//        intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -34,9 +36,8 @@ public class ArmTest extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             intake();
-            motorPower();
-            servoAdjust();
             servoToLimits();
+            servoAdjust();
 
             // Show the elapsed game time and wheel power.
             telemetry.update();
@@ -44,34 +45,60 @@ public class ArmTest extends LinearOpMode {
     }
 
     public void intake() {
-        if (gamepad1.a) {
-            currentTime = runtime.milliseconds();
-            intake.setPower(0.25);
-            newTime = runtime.milliseconds();
+//        if (Math.abs(gamepad1.right_stick_y) > 0.1) {
+//            intake.setPower(0.3 * gamepad1.right_stick_y);
+//        } else {
+//            intake.setPower(0);
+//        }
 
-            if (newTime-currentTime > 500) {
-                intake.setPower(0);
+        intake.setPower(0.4 * gamepad1.right_stick_y);
 
-            }
-        } else if (gamepad1.b) {
-            intake.setPower(0);
-        }
+//        if (gamepad1.a) {
+////            currentTime = runtime.milliseconds();
+////            intake.setTargetPosition(300);
+////            intake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////
+////            intake.setPower(0.5);
+////            newTime = runtime.milliseconds();
+////
+////            if (Math.abs(intake.getCurrentPosition() - 300) < 10) {
+////                intake.setPower(0);
+////            }
+////            if (newTime-currentTime > 20000) {
+////                intake.setPower(0);
+////
+////            }
+//        } else if (gamepad1.b) {
+//            intake.setPower(0);
+//        } else if(gamepad1.left_bumper){
+////            intake.setTargetPosition(-300);
+////            intake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////
+////            intake.setPower(-.5);
+////
+////            if (Math.abs(intake.getCurrentPosition() + 300) < 10) {
+////                intake.setPower(0);
+////            }
+////            if (newTime-currentTime > 20000) {
+////                intake.setPower(0);
+////
+////            }
+//        }
     }
 
-    public void motorPower(){
-        intake.setPower(gamepad1.left_stick_y);
-        intake.setPower(gamepad1.right_stick_y);
-    }
 
-    public void servoAdjust(){
-        servo.setPosition(servo.getPosition() + (-gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_y + gamepad1.right_stick_x)/1000);
-    }
     public void servoToLimits(){
         if(gamepad1.x){
             servo.setPosition(.5);
+            // closed
         }
         else if(gamepad1.y){
             servo.setPosition(0);
+            // open
         }
+    }
+
+    public void servoAdjust(){
+        servo.setPosition(servo.getPosition() + (-gamepad1.left_stick_y + gamepad1.left_stick_x)/1000);
     }
 }

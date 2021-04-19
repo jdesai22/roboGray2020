@@ -21,7 +21,6 @@ public class MainTeleOp extends LinearOpMode {
     ////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////
 
-    //int chungoidPos = 0;
     private ElapsedTime runtime = new ElapsedTime();
     public ElapsedTime launchTime = new ElapsedTime();
 
@@ -31,8 +30,8 @@ public class MainTeleOp extends LinearOpMode {
 
     //    tune these constants
     final int launchBuffer = 200;
-    final double upServo = .4;
-    final double bottomServo = .657;
+    final double upServo = .52;
+    final double bottomServo = 83;
     final boolean armOverride = false;
 
     @Override
@@ -62,12 +61,14 @@ public class MainTeleOp extends LinearOpMode {
             push();
             launch();
             intake();
+            clawClose();
+            controlArm();
 
             resetEncoders();
 
-            if(!armOverride) {
-                robo.clearArmVoltage();
-            }
+//            if(!armOverride) {
+//                robo.clearArmVoltage();
+//            }
 
             telemetry.addData("Back Left", robo.backLeft.getCurrentPosition());
             telemetry.addData("Front Left", robo.frontLeft.getCurrentPosition());
@@ -121,6 +122,11 @@ public class MainTeleOp extends LinearOpMode {
             double gyroAngle = 0;
             double magnitudeMultiplier = 0;
 
+            if (toggleMap1.guide) {
+//                try this for field centric driving
+                gyroAngle = robo.imu.getAngularOrientation().firstAngle;
+            }
+
 //            ALL TRIG IS IN RADIANS
             double modifiedTheta = theta + Math.PI / 4 - gyroAngle;
 
@@ -151,13 +157,13 @@ public class MainTeleOp extends LinearOpMode {
 //            robo.pusher.setPosition(bottomServo);
 //        }
 
-        if (gamepad1.right_bumper && launchTime.milliseconds() >= 150 && !servoMoving && toggleMap1.a) {
+        if (gamepad1.right_bumper && launchTime.milliseconds() >= 300 && !servoMoving && toggleMap1.a) {
             robo.pusher.setPosition(upServo);
             servoMoving = true;
             launchTime.reset();
         }
 
-        if (launchTime.milliseconds() >= 150 && servoMoving) {
+        if (launchTime.milliseconds() >= 300 && servoMoving) {
             robo.pusher.setPosition(bottomServo);
             servoMoving = false;
             launchTime.reset();
@@ -192,11 +198,16 @@ public class MainTeleOp extends LinearOpMode {
     public void launch() {
 //        check
         if(toggleMap1.a) {
-            robo.launcher.setPower(1);
+            if (toggleMap1.left_bumper) {
+                robo.launcher.setPower(.75);
+                telemetry.addData("Launcher:", "POWERSHOT MODE");
+            } else {
+                robo.launcher.setPower(1);
+                telemetry.addData("Launcher:", "HIGH GOAL");
+            }
 //            launcherRunning = true;
 //            toggleMap1.x = false;
 //            toggleMap1.y = false;
-            telemetry.addData("Launcher:", "RUNNING");
         } else {
             robo.launcher.setPower(0);
 //            launcherRunning = false;
@@ -210,16 +221,32 @@ public class MainTeleOp extends LinearOpMode {
 
     }
 
+    public void clawClose() {
+        if(toggleMap1.b){
+            robo.grasp.setPosition(.5);
+            // closed
+        }
+        else {
+            robo.grasp.setPosition(0);
+            // open
+        }
+    }
+
+    public void controlArm() {
+        robo.arm.setPower(.4 * gamepad1.right_stick_y);
+
+    }
+
     public void intake() {
 //        check
         if (toggleMap1.x) {
             robo.intake1.setPower(1);
-            robo.intake2.setPower(.55);
-            telemetry.addData("Intake:", "NORMAL");
+            robo.intake2.setPower(1);
+            telemetry.addData("Intake:", "REVERSE");
         } else if (toggleMap1.y){
             robo.intake1.setPower(-1);
-            robo.intake2.setPower(-.55);
-            telemetry.addData("Intake:", "REVERSE");
+            robo.intake2.setPower(-1);
+            telemetry.addData("Intake:", "NORMAL");
         } else {
             robo.intake1.setPower(0);
             robo.intake2.setPower(0);
@@ -255,7 +282,6 @@ public class MainTeleOp extends LinearOpMode {
         if(gamepad1.left_bumper && cdCheck(useMap1.left_bumper, 500)){
             toggleMap1.left_bumper = toggle(toggleMap1.left_bumper);
             useMap1.left_bumper = runtime.milliseconds();
-
         }
         if(gamepad1.right_bumper && cdCheck(useMap1.right_bumper, 500)){
             toggleMap1.right_bumper = toggle(toggleMap1.right_bumper);
@@ -284,6 +310,10 @@ public class MainTeleOp extends LinearOpMode {
         if (toggleMap1.right_bumper && cdCheck(useMap1.right_bumper, launchBuffer)) {
             toggleMap1.right_bumper = false;
             useMap1.right_bumper = runtime.milliseconds();
+        }
+        if (gamepad1.guide && cdCheck(useMap1.guide, 500)) {
+            toggleMap1.guide = toggle(toggleMap1.guide);
+            useMap1.guide = runtime.milliseconds();
         }
 
 

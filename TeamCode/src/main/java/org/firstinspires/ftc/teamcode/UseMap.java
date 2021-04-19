@@ -30,5 +30,7 @@ public class UseMap {
     double left_stick_y_pos = 0; //> 0
     double left_stick_y_neg = 0; //< 0
 
+    double guide = 0;
+
 }
 

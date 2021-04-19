@@ -10,7 +10,7 @@ public class ServoTest extends LinearOpMode {
     private Servo servo = null;
     @Override
     public void runOpMode() {
-        servo = hardwareMap.servo.get("servo");
+        servo = hardwareMap.servo.get("claw");
 
 
         while(!opModeIsActive()){

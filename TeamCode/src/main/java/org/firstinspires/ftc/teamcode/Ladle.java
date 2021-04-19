@@ -87,15 +87,15 @@ public class Ladle {
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //PUSHER//
-//        pusher = hwMap.servo.get("pusher");
+        pusher = hwMap.servo.get("pusher");
 
         //ARM//
-//        arm = hwMap.dcMotor.get("arm");
-//        arm.setDirection(DcMotor.Direction.FORWARD); //adjust accordingly
-//        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm = hwMap.dcMotor.get("arm");
+        arm.setDirection(DcMotor.Direction.FORWARD); //adjust accordingly
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //
-//        grasp = hwMap.servo.get("grasp");
+        grasp = hwMap.servo.get("claw");
 
 
         //IMU//
@@ -104,21 +104,21 @@ public class Ladle {
 
     }
 
-    public void clearArmVoltage() {
-        if(!arm.isBusy()) {
-            arm.setPower(0);
-        }
-    }
-
-    public void raiseArm() {
-        arm.setTargetPosition(upArm);
-        arm.setPower(.6);
-    }
-
-    public void lowerArm() {
-        arm.setTargetPosition(downArm);
-        arm.setPower(-.6);
-    }
+//    public void clearArmVoltage() {
+//        if(!arm.isBusy()) {
+//            arm.setPower(0);
+//        }
+//    }
+//
+//    public void raiseArm() {
+//        arm.setTargetPosition(upArm);
+//        arm.setPower(.6);
+//    }
+//
+//    public void lowerArm() {
+//        arm.setTargetPosition(downArm);
+//        arm.setPower(-.6);
+//    }
 
     public void graspWobble() {
         grasp.setPosition(closeGrasp);
@@ -128,21 +128,21 @@ public class Ladle {
         grasp.setPosition(openGrasp);
     }
 
-    public void acquireWobbleGoal() {
-        graspWobble();
-
-        if(Math.abs(grasp.getPosition()-closeGrasp) < 0.05) {
-            raiseArm();
-        }
-    }
-
-    public void depositWobbleGoal() {
-        lowerArm();
-
-        if (Math.abs(arm.getCurrentPosition()-downArm) <  10) {
-            ungraspWobble();
-        }
-    }
+//    public void acquireWobbleGoal() {
+//        graspWobble();
+//
+//        if(Math.abs(grasp.getPosition()-closeGrasp) < 0.05) {
+//            raiseArm();
+//        }
+//    }
+//
+//    public void depositWobbleGoal() {
+//        lowerArm();
+//
+//        if (Math.abs(arm.getCurrentPosition()-downArm) <  10) {
+//            ungraspWobble();
+//        }
+//    }
 
     public void mecanumDrive(double pX, double pY, double pRot){
         frontLeft.setPower(pY + pRot);

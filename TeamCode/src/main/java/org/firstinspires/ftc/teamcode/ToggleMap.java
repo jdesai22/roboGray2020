@@ -30,4 +30,6 @@ public class ToggleMap {
     boolean left_stick_y_pos = false; //> 0
     boolean left_stick_y_neg = false; //< 0
 
+    boolean guide = false;
+
 }
