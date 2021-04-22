@@ -41,6 +41,9 @@ public class Ladle {
     final double closeGrasp = .8;
     final double openGrasp = .2;
 
+    final double upServo = .50;
+    final double downServo = .83;
+
     //IMU//
     BNO055IMU imu;
 

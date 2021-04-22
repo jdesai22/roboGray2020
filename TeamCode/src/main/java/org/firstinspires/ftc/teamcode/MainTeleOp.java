@@ -4,6 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
 @TeleOp(name="MainTeleOp", group="main")
 public class MainTeleOp extends LinearOpMode {
     Ladle robo = new Ladle();
@@ -28,10 +33,15 @@ public class MainTeleOp extends LinearOpMode {
     boolean launcherRunning = false;
     boolean servoMoving = false;
 
+//    IMU STUFF
+    double newZero = 0;
+    int fullRotationCount = 0;
+    double previousAngle = 0;
+
     //    tune these constants
     final int launchBuffer = 200;
-    final double upServo = .52;
-    final double bottomServo = 83;
+    final double upServo = .52;// originally .52
+    final double bottomServo = .83;
     final boolean armOverride = false;
 
     @Override
@@ -57,6 +67,7 @@ public class MainTeleOp extends LinearOpMode {
         launchTime.reset();
         while(opModeIsActive()){
             updateKeys();
+            angleOverflow();
             drive();
             push();
             launch();
@@ -124,7 +135,9 @@ public class MainTeleOp extends LinearOpMode {
 
             if (toggleMap1.guide) {
 //                try this for field centric driving
-                gyroAngle = robo.imu.getAngularOrientation().firstAngle;
+                gyroAngle = getHeading();
+            } else {
+                gyroAngle = 0;
             }
 
 //            ALL TRIG IS IN RADIANS
@@ -306,11 +319,12 @@ public class MainTeleOp extends LinearOpMode {
             useMap1.y = runtime.milliseconds();
             toggleMap1.x = false;
         }
-//        test
+
         if (toggleMap1.right_bumper && cdCheck(useMap1.right_bumper, launchBuffer)) {
             toggleMap1.right_bumper = false;
             useMap1.right_bumper = runtime.milliseconds();
         }
+
         if (gamepad1.guide && cdCheck(useMap1.guide, 500)) {
             toggleMap1.guide = toggle(toggleMap1.guide);
             useMap1.guide = runtime.milliseconds();
@@ -339,4 +353,30 @@ public class MainTeleOp extends LinearOpMode {
 
     }
 
+//    COPIED FROM ROVER RUCKUS
+    public double getHeading(){ //Includes angle subtraction, angle to radian conversion, and 180>-180 to regular system conversion
+        Orientation angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = angles.firstAngle;
+        heading = (Math.PI/180)*heading;
+        if(heading < 0){
+            heading = (2*Math.PI) + heading;
+        }
+
+        heading = heading - newZero;
+
+        heading += fullRotationCount*(2*Math.PI);
+        return heading;
+    }
+
+    public void angleOverflow(){ //Increase fullRotationCount when angle goes above 2*PI or below 0
+        double heading = getHeading() - fullRotationCount*(2*Math.PI);
+        //Warning: Will break if the robot does a 180 in less thank 1 tick, but that probably won't happen
+        if(heading < Math.PI/2 && previousAngle > 3*Math.PI/2){
+            fullRotationCount++;
+        }
+        if(heading > 3*Math.PI/2 && previousAngle < Math.PI/2){
+            fullRotationCount--;
+        }
+        previousAngle = heading;
+    }
 }

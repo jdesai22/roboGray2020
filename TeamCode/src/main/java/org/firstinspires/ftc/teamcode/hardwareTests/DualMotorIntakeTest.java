@@ -1,33 +1,37 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.hardwareTests;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="newMotorTest", group="Test")
 
-public class MotorTest extends LinearOpMode{
-    private DcMotor intake;
+@TeleOp(name="dualMotorTest", group="Test")
+public class DualMotorIntakeTest extends LinearOpMode{
+    private DcMotor intake1;
+    private DcMotor intake2;
 
     // Robot robot = new Robot();
 
-        // Declare OpMode members.
+    // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
-        intake = hardwareMap.dcMotor.get("arm");
+        intake1 = hardwareMap.dcMotor.get("intake1");
 
-        intake.setDirection(DcMotor.Direction.FORWARD);
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+//        mess w/FORWARD anD REVERSE to get it moving in right direction
+        intake1.setDirection(DcMotor.Direction.FORWARD);
+        intake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        intake2 = hardwareMap.dcMotor.get("intake2");
+
+//        mess w/FORWARD anD REVERSE to get it moving in right direction
+        intake2.setDirection(DcMotor.Direction.FORWARD);
+        intake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -39,7 +43,6 @@ public class MotorTest extends LinearOpMode{
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             intake();
-            motorPower();
             // Show the elapsed game time and wheel power.
             telemetry.update();
         }
@@ -47,15 +50,16 @@ public class MotorTest extends LinearOpMode{
 
     public void intake() {
         if (gamepad1.a) {
-            intake.setPower(0.25);
+            intake1.setPower(1);
         } else if (gamepad1.b) {
-            intake.setPower(0);
+            intake1.setPower(0);
         }
-    }
 
-    public void motorPower(){
-        intake.setPower(gamepad1.left_stick_y);
-        intake.setPower(gamepad1.right_stick_y);
+        if (gamepad1.x) {
+            intake2.setPower(1);
+        } else if (gamepad1.y) {
+            intake2.setPower(0);
+        }
     }
 
 }

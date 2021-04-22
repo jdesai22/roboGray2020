@@ -169,11 +169,17 @@ public class SampleMecanumDrive extends MecanumDrive {
 //        backLeft.setDirection(DcMotor.Direction.FORWARD);
 //        backRight.setDirection(DcMotor.Direction.REVERSE);
 //        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
 
+
+//        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+//        backLeft.setDirection(DcMotor.Direction.REVERSE);
+//        backRight.setDirection(DcMotor.Direction.FORWARD);
+//        frontRight.setDirection(DcMotor.Direction.FORWARD);
+
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
@@ -394,10 +400,15 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        frontLeft.setPower(v);
-        backLeft.setPower(v1);
-        frontRight.setPower(v2);
-        backRight.setPower(v3);
+//        frontLeft.setPower(v);
+//        backLeft.setPower(v1);
+//        frontRight.setPower(v2);
+//        backRight.setPower(v3);
+
+        backRight.setPower(v);
+        frontRight.setPower(v1);
+        frontLeft.setPower(v2);
+        backLeft.setPower(v3);
     }
 
     @Override
