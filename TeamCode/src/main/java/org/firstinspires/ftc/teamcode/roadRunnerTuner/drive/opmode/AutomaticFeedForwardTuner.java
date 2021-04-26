@@ -34,6 +34,7 @@ import static org.firstinspires.ftc.teamcode.roadRunnerTuner.drive.DriveConstant
  */
 @Config
 @Autonomous(group = "drive")
+@Disabled
 public class AutomaticFeedForwardTuner extends LinearOpMode {
     public static double MAX_POWER = 0.7;
     public static double DISTANCE = 100; // in

@@ -107,6 +107,39 @@ public class Ladle {
 
     }
 
+    public void autoInit(HardwareMap hwMap) {
+        //////////////////////////////////
+        /* RETRIEVING STUFF FROM PHONES */
+        //////////////////////////////////
+
+        //INTAKE// check forward and reverse
+        intake1 = hwMap.dcMotor.get("intake1");
+        intake1.setDirection(DcMotor.Direction.FORWARD);
+        intake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        intake2 = hwMap.dcMotor.get("intake2");
+        intake2.setDirection(DcMotor.Direction.FORWARD);
+        intake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+
+        //Launcher//
+        launcher = hwMap.dcMotor.get("launcher");
+        launcher.setDirection(DcMotor.Direction.REVERSE);
+        launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //PUSHER//
+        pusher = hwMap.servo.get("pusher");
+
+        //ARM//
+        arm = hwMap.dcMotor.get("arm");
+        arm.setDirection(DcMotor.Direction.FORWARD); //adjust accordingly
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+        grasp = hwMap.servo.get("claw");
+
+    }
 //    public void clearArmVoltage() {
 //        if(!arm.isBusy()) {
 //            arm.setPower(0);

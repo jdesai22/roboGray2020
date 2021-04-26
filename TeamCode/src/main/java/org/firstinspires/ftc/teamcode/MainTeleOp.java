@@ -40,7 +40,7 @@ public class MainTeleOp extends LinearOpMode {
 
     //    tune these constants
     final int launchBuffer = 200;
-    final double upServo = .52;// originally .52
+    final double upServo = .48;// originally .52
     final double bottomServo = .83;
     final boolean armOverride = false;
 
@@ -54,7 +54,7 @@ public class MainTeleOp extends LinearOpMode {
 
         double startTime = 0;
 
-        waitForStart();
+
 
         while(!opModeIsActive()) {
 
@@ -65,6 +65,11 @@ public class MainTeleOp extends LinearOpMode {
         startTime = runtime.milliseconds();
         robo.pusher.setPosition(bottomServo);
         launchTime.reset();
+
+        waitForStart();
+
+        if (isStopRequested()) return;
+
         while(opModeIsActive()){
             updateKeys();
             angleOverflow();
@@ -77,9 +82,6 @@ public class MainTeleOp extends LinearOpMode {
 
             resetEncoders();
 
-//            if(!armOverride) {
-//                robo.clearArmVoltage();
-//            }
 
             telemetry.addData("Back Left", robo.backLeft.getCurrentPosition());
             telemetry.addData("Front Left", robo.frontLeft.getCurrentPosition());
@@ -247,7 +249,6 @@ public class MainTeleOp extends LinearOpMode {
 
     public void controlArm() {
         robo.arm.setPower(.4 * gamepad1.right_stick_y);
-
     }
 
     public void intake() {

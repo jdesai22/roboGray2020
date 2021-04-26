@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardwareTests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 
 
 @TeleOp(name="dualMotorTest", group="Test")
+@Disabled
 public class DualMotorIntakeTest extends LinearOpMode{
     private DcMotor intake1;
     private DcMotor intake2;

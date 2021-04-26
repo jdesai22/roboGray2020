@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.autoTests.vision;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
-
+@Disabled
 @TeleOp(name = "Test Detection", group = "Concept")
 public class RingDetectTest extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "detect.tflite";

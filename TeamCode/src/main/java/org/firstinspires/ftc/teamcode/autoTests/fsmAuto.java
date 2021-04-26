@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Ladle;
 import org.firstinspires.ftc.teamcode.roadRunnerTuner.drive.SampleMecanumDrive;
 
-@Autonomous(group = "advanced")
+@Autonomous(name = "fsmAutoZone1", group = "advanced")
 public class fsmAuto extends LinearOpMode {
 
     // This enum defines our "state"
@@ -20,9 +20,12 @@ public class fsmAuto extends LinearOpMode {
         Start,
         LaunchArea,
         Shoot,
+        DropGoal1,
+        DropGoal2,
         ZoneA,
-        Pickup,
         ZoneA2,
+        Pickup,
+        RaiseGoal,
         Park
     }
 
@@ -34,7 +37,7 @@ public class fsmAuto extends LinearOpMode {
     // This assumes we start at x: 15, y: 10, heading: 180 degrees
     Pose2d startPose = new Pose2d(-62.0, -18.0, 0.0);
 
-    final double upServo = .50;
+    final double upServo = .48;
     final double bottomServo = .83;
 
     boolean servoMoving = false;
@@ -47,7 +50,7 @@ public class fsmAuto extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         Ladle robo = new Ladle();
-        robo.init(hardwareMap);
+        robo.autoInit(hardwareMap);
 
         // Set inital pose
         drive.setPoseEstimate(startPose);
@@ -57,7 +60,7 @@ public class fsmAuto extends LinearOpMode {
 //        check if need to break this into two diff trajectories
         Trajectory MoveToLaunchArea = drive.trajectoryBuilder(startPose)
                 .forward(40.0)
-                .splineTo(new Vector2d(0.0, -40.0), 0.0)
+                .splineTo(new Vector2d(-1.0, -36.0), 0.0)
                 .build();
 
         Trajectory ZoneA = drive.trajectoryBuilder(MoveToLaunchArea.end())
@@ -65,8 +68,8 @@ public class fsmAuto extends LinearOpMode {
                 .build();
 
         Trajectory ZoneAReturn = drive.trajectoryBuilder(ZoneA.end(), true)
-                .splineTo(new Vector2d(0.0, -40.0), 0.0)
-                .splineTo(new Vector2d(-50.0, -35.0), 0.0)
+//                .splineTo(new Vector2d(0.0, -40.0), 0.0)
+                .splineTo(new Vector2d(-45.0, -35.0), Math.toRadians(180))
                 .build();
 
         Trajectory ZoneA1 = drive.trajectoryBuilder(ZoneAReturn.end())
@@ -82,7 +85,7 @@ public class fsmAuto extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        currentState = State.LaunchArea;
+        currentState = State.Shoot;
         drive.followTrajectoryAsync(MoveToLaunchArea);
 
         while (opModeIsActive() && !isStopRequested()) {
@@ -92,6 +95,21 @@ public class fsmAuto extends LinearOpMode {
 
             // We essentially define the flow of the state machine through this switch statement
             switch (currentState) {
+
+
+//                    break;
+
+
+                case Shoot:
+
+                    if (!drive.isBusy()) {
+                        shootRings(robo);
+                        sleep(500);
+                        currentState = State.LaunchArea;
+                    }
+
+                    break;
+
                 case LaunchArea:
                     // Check if the drive class isn't busy
                     // `isBusy() == true` while it's following the trajectory
@@ -99,32 +117,81 @@ public class fsmAuto extends LinearOpMode {
                     // We move on to the next state
                     // Make sure we use the async follow function
                     if (!drive.isBusy()) {
-                        currentState = State.ZoneA;
                         drive.followTrajectoryAsync(ZoneA);
+                        currentState = State.DropGoal1;
+                    }
+
+                    break;
+
+                case DropGoal1:
+
+
+                    if (!drive.isBusy()) {
+                        dropWobble(robo);
+
+                        sleep(500);
+
+                        currentState = State.ZoneA;
                     }
                     break;
 
-//                case Shoot:
-//                    shootRings(robo);
-//                    break;
                 case ZoneA:
                     // Check if the drive class is busy following the trajectory
-                    // Move on to the next state, TURN_1, once finished
+
                     if (!drive.isBusy()) {
-                        currentState = State.Pickup;
                         drive.followTrajectoryAsync(ZoneAReturn);
+                        currentState = State.RaiseGoal;
                     }
+
                     break;
-                case Pickup:
+
+
+//
+                case RaiseGoal:
                     // Check if the drive class is busy turning
                     // If not, move onto the next state, TRAJECTORY_3, once finished
                     if (!drive.isBusy()) {
+
+
+
+                        sleep(500);
+
+                        raiseWobble(robo);
+
                         currentState = State.ZoneA2;
+
+                        sleep(500);
+
+                    }
+
+                    break;
+//
+                case ZoneA2:
+
+                    if (!drive.isBusy()) {
+                        currentState = State.DropGoal2;
                         drive.followTrajectoryAsync(ZoneA1);
                     }
-                    break;
-                case Park:
 
+
+                    break;
+////
+                case DropGoal2:
+
+
+
+                    if (!drive.isBusy()) {
+                        sleep(500);
+
+                        dropWobble(robo);
+
+                        sleep(500);
+
+                        currentState = State.Park;
+                    }
+                    break;
+
+                case Park:
                     break;
 
 
@@ -146,7 +213,7 @@ public class fsmAuto extends LinearOpMode {
 
         sleep(300);
 
-        for (int i = 0; i <= 5; i++) {
+        for (int i = 0; i <= 3; i++) {
             boolean cycle = false;
 
             while (!cycle) {
@@ -165,6 +232,29 @@ public class fsmAuto extends LinearOpMode {
         }
 
         robo.launcher.setPower(0);
+
+    }
+
+    public void raiseWobble(Ladle robo) {
+        robo.grasp.setPosition(0);
+
+        sleep(500);
+        //neg power = drop
+        robo.arm.setPower(-.55);
+        sleep(700);
+        robo.arm.setPower(0);
+
+    }
+
+    public void dropWobble(Ladle robo) {
+
+        robo.arm.setPower(.4);
+        sleep(1000);
+
+
+        robo.arm.setPower(0);
+        robo.grasp.setPosition(0.5);
+
 
     }
 }
