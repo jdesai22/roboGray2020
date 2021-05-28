@@ -127,9 +127,12 @@ public class fsmAuto extends LinearOpMode {
 
 
                     if (!drive.isBusy()) {
-                        dropWobble(robo);
 
                         sleep(500);
+
+                        dropWobble(robo);
+
+                        sleep(750);
 
                         currentState = State.ZoneA;
                     }
@@ -139,6 +142,7 @@ public class fsmAuto extends LinearOpMode {
                     // Check if the drive class is busy following the trajectory
 
                     if (!drive.isBusy()) {
+                        resetDown(robo);
                         drive.followTrajectoryAsync(ZoneAReturn);
                         currentState = State.RaiseGoal;
                     }
@@ -235,7 +239,7 @@ public class fsmAuto extends LinearOpMode {
 
     }
 
-    public void raiseWobble(Ladle robo) {
+    public void raiseWobbleOld(Ladle robo) {
         robo.grasp.setPosition(0);
 
         sleep(500);
@@ -246,7 +250,7 @@ public class fsmAuto extends LinearOpMode {
 
     }
 
-    public void dropWobble(Ladle robo) {
+    public void dropWobbleOld(Ladle robo) {
 
         robo.arm.setPower(.4);
         sleep(1000);
@@ -256,5 +260,62 @@ public class fsmAuto extends LinearOpMode {
         robo.grasp.setPosition(0.5);
 
 
+    }
+
+    public void raiseWobble(Ladle robo) {
+//        robo.grasp.setPosition(0.5);
+//        robo.arm.setPower(-.6);
+
+//        sleep(500);
+
+        robo.grasp.setPosition(0);
+
+        sleep(500);
+        robo.arm.setPower(-.65);
+        sleep(650);
+        robo.arm.setPower(0);
+
+    }
+
+
+    public void dropWobble(Ladle robo) {
+
+//        robo.arm.setPower(.4);
+//        sleep(1000);
+//
+//        robo.arm.setPower(0);
+//        robo.grasp.setPosition(0.5);
+//
+//        sleep(500);
+//        robo.arm.setPower(0);
+
+//        sleep(500);
+
+
+//        sleep(500);
+
+
+        robo.arm.setPower(.5);
+        sleep(600);
+
+        robo.arm.setPower(0);
+        robo.grasp.setPosition(0.5);
+
+        sleep(700);
+
+        resetUp(robo);
+
+    }
+
+    public void resetUp(Ladle robo) {
+        robo.arm.setPower(-.65);
+        sleep(350);
+        robo.arm.setPower(0);
+    }
+
+    public void resetDown(Ladle robo) {
+        robo.arm.setPower(.65);
+        sleep(500);
+        robo.arm.setPower(0);
     }
 }

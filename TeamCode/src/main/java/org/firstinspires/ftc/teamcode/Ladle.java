@@ -15,6 +15,32 @@ public class Ladle {
     /* DECLARATIONS */
     //////////////////
 
+    // Expansion Hub - 2, now 6, 3!
+    /*
+    0 - fl
+    1 - bl
+    2 - launcher
+    3 - arm
+
+    Servo
+    0 - leftServo
+     */
+
+    // Control HUb - 173
+    /*
+    0 - fr
+    1 - br
+    2 - intake1 --> core hex
+    3 - intake2 --> 20:1
+
+    Servo
+    0 - Pusher
+    1 - claw
+    4 - rightServo
+    5 - stopper
+
+     */
+
     //DRIVE//
     public DcMotor frontLeft   = null;
     public DcMotor backLeft    = null;
@@ -35,7 +61,15 @@ public class Ladle {
     public DcMotor arm = null;
     public Servo grasp = null;
 
-//    tune these
+    //STOPPER//
+    public Servo stopper = null;
+
+    //PLATFORM//
+    public Servo servo = null;
+    public Servo servo1 = null;
+
+
+    //    tune these
     final int  upArm = 500;
     final int downArm = 100;
     final double closeGrasp = .8;
@@ -43,6 +77,7 @@ public class Ladle {
 
     final double upServo = .50;
     final double downServo = .83;
+
 
     //IMU//
     BNO055IMU imu;
@@ -100,6 +135,14 @@ public class Ladle {
 //
         grasp = hwMap.servo.get("claw");
 
+        stopper = hwMap.servo.get("stopper");
+
+
+        //PLATFORM//
+        servo = hwMap.servo.get("rightServo");
+        // right servo = 5
+        // left servo = 4
+        servo1 = hwMap.servo.get("leftServo");
 
         //IMU//
         imu = hwMap.get(BNO055IMU.class, "imu");
@@ -139,22 +182,27 @@ public class Ladle {
 //
         grasp = hwMap.servo.get("claw");
 
+        stopper = hwMap.servo.get("stopper");
+
+
+        //PLATFORM//
+        servo = hwMap.servo.get("rightServo");
+        // right servo = 5
+        // left servo = 4
+        servo1 = hwMap.servo.get("leftServo");
+
+
     }
-//    public void clearArmVoltage() {
-//        if(!arm.isBusy()) {
-//            arm.setPower(0);
-//        }
-//    }
-//
-//    public void raiseArm() {
-//        arm.setTargetPosition(upArm);
-//        arm.setPower(.6);
-//    }
-//
-//    public void lowerArm() {
-//        arm.setTargetPosition(downArm);
-//        arm.setPower(-.6);
-//    }
+
+    public void platformUp() {
+        servo.setPosition(.51);
+        servo1.setPosition(.49);
+    }
+
+    public void platformDown() {
+        servo.setPosition(0.05);
+        servo1.setPosition(.95);
+    }
 
     public void graspWobble() {
         grasp.setPosition(closeGrasp);
@@ -163,22 +211,6 @@ public class Ladle {
     public void ungraspWobble() {
         grasp.setPosition(openGrasp);
     }
-
-//    public void acquireWobbleGoal() {
-//        graspWobble();
-//
-//        if(Math.abs(grasp.getPosition()-closeGrasp) < 0.05) {
-//            raiseArm();
-//        }
-//    }
-//
-//    public void depositWobbleGoal() {
-//        lowerArm();
-//
-//        if (Math.abs(arm.getCurrentPosition()-downArm) <  10) {
-//            ungraspWobble();
-//        }
-//    }
 
     public void mecanumDrive(double pX, double pY, double pRot){
         frontLeft.setPower(pY + pRot);

@@ -13,9 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.roadRunnerTuner.drive.SampleMecanumDrive;
 
-@TeleOp(name="MainTeleOp", group="main")
+@TeleOp(name="TriggerDriveQualifierTeleOp", group="main")
 @Disabled
-public class MainTeleOp extends LinearOpMode {
+public class QualifierTeleOpTrigger extends LinearOpMode {
     Ladle robo = new Ladle();
 
     //    for controller 1
@@ -34,14 +34,9 @@ public class MainTeleOp extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     public ElapsedTime launchTime = new ElapsedTime();
 
-//    VARIABLES
+    //    VARIABLES
     boolean launcherRunning = false;
     boolean servoMoving = false;
-
-//    IMU STUFF
-    double newZero = 0;
-    int fullRotationCount = 0;
-    double previousAngle = 0;
 
     //    tune these constants
     final int launchBuffer = 200;
@@ -51,13 +46,18 @@ public class MainTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode(){
-        robo.init(hardwareMap);
-        robo.imu();
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        robo.autoInit(hardwareMap);
+
+//        robo.imu();
 //        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 //
 //        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        robo.runWithoutEncoderDrive();
+//        robo.runWithoutEncoderDrive();
 
 
         double startTime = 0;
@@ -81,15 +81,14 @@ public class MainTeleOp extends LinearOpMode {
 
         while(opModeIsActive()){
             updateKeys();
-//            angleOverflow();
-            roboDrive();
+            roboDrive(drive);
             push();
             launch();
             intake();
             clawClose();
             controlArm();
 
-            resetEncoders();
+//            resetEncoders();
 
 
 
@@ -104,109 +103,77 @@ public class MainTeleOp extends LinearOpMode {
 
 
     //Player 1
-    public void roboDrive() {
-        double stick_x = -gamepad1.left_stick_x;
-        double stick_y = gamepad1.left_stick_y;
-        double pX = 0;
-        double pY = 0;
-        double pRot = 0;
-        double rotMultiplier = 0.6;
-        double theta = Math.atan2(stick_y, stick_x); //Arctan2 doesn't have bad range restriction
-
-        if (gamepad1.dpad_up || gamepad1.dpad_right || gamepad1.dpad_left || gamepad1.dpad_down) {
-
-            double mag = 0.25;
-            if (gamepad1.dpad_up) {
-                pX = mag;
-                pY = -mag;
-            } else if (gamepad1.dpad_left) {
-                pX = 2*mag;
-                pY = 2*mag;
-            } else if (gamepad1.dpad_down) {
-                pX = -mag;
-                pY = mag;
-            } else if (gamepad1.dpad_right) {
-                pX = -2*mag;
-                pY = -2*mag;
-            }
-
-            pRot = -rotMultiplier*(gamepad1.right_trigger-gamepad1.left_trigger);
-            robo.mecanumDrive(pX, pY, -pRot);
-        }
-
-        else {
-
-            if (toggleMap1.guide) {
-                pRot = -0.6 * rotMultiplier*(gamepad1.right_trigger-gamepad1.left_trigger);
-
-                if (gamepad1.left_stick_y == 0 && gamepad1.left_stick_x == 0) {
-                    pRot = -rotMultiplier*(gamepad1.right_trigger-gamepad1.left_trigger);
-                }
-
-                double gyroAngle = 0;
-                double magnitudeMultiplier = 0;
-
-//            if (toggleMap1.guide) {
-////                try this for field centric driving
-//                gyroAngle = getHeading();
-//            } else {
-//                gyroAngle = 0;
+    public void roboDrive(SampleMecanumDrive drive) {
+//        double stick_x = -gamepad1.left_stick_x;
+//        double stick_y = gamepad1.left_stick_y;
+//        double pX = 0;
+//        double pY = 0;
+//        double pRot = 0;
+//        double rotMultiplier = 0.6;
+//        double theta = Math.atan2(stick_y, stick_x); //Arctan2 doesn't have bad range restriction
+//
+//        if (gamepad1.dpad_up || gamepad1.dpad_right || gamepad1.dpad_left || gamepad1.dpad_down) {
+//
+//            double mag = 0.25;
+//            if (gamepad1.dpad_up) {
+//                pX = mag;
+//                pY = -mag;
+//            } else if (gamepad1.dpad_left) {
+//                pX = 2*mag;
+//                pY = 2*mag;
+//            } else if (gamepad1.dpad_down) {
+//                pX = -mag;
+//                pY = mag;
+//            } else if (gamepad1.dpad_right) {
+//                pX = -2*mag;
+//                pY = -2*mag;
 //            }
-
-//            ALL TRIG IS IN RADIANS
-                double modifiedTheta = theta + Math.PI / 4 - gyroAngle;
-
-                double thetaInFirstQuad = Math.abs(Math.atan(stick_y / stick_x)); //square to circle conversion
-//            arctan is same as tan inverse
-
-                if (thetaInFirstQuad > Math.PI / 4) {
-                    magnitudeMultiplier = Math.sin(thetaInFirstQuad); //Works because we know y is 1 when theta > Math.pi/4
-                } else if (thetaInFirstQuad <= Math.PI / 4) {
-                    magnitudeMultiplier = Math.cos(thetaInFirstQuad); //Works because we know x is 1 when theta < Math.pi/4
-                }
-
-                double magnitude = Math.sqrt(Math.pow(stick_x, 2) + Math.pow(stick_y, 2)) * magnitudeMultiplier * (1 - Math.abs(pRot)); //Multiplied by (1-pRot) so it doesn't go over 1 with rotating
-                pX = magnitude * Math.cos(modifiedTheta);
-                pY = magnitude * Math.sin(modifiedTheta);
-
-                robo.mecanumDrive(pX, pY, -pRot);
-            } else {
-                pRot = -0.6 * rotMultiplier*(gamepad1.right_stick_x);
-
-                if (gamepad1.left_stick_y == 0 && gamepad1.left_stick_x == 0) {
-                    pRot = -rotMultiplier*(gamepad1.right_stick_x);
-                }
-
-                double gyroAngle = 0;
-                double magnitudeMultiplier = 0;
-
-//            if (toggleMap1.guide) {
-////                try this for field centric driving
-//                gyroAngle = getHeading();
-//            } else {
-//                gyroAngle = 0;
+//
+//            pRot = -rotMultiplier*(gamepad1.right_trigger-gamepad1.left_trigger);
+//            robo.mecanumDrive(pX, pY, -pRot);
+//        }
+//
+//        else {
+//
+//
+//            pRot = -0.6 * rotMultiplier*(gamepad1.right_trigger-gamepad1.left_trigger);
+//
+//            if (gamepad1.left_stick_y == 0 && gamepad1.left_stick_x == 0) {
+//                pRot = -rotMultiplier*(gamepad1.right_trigger-gamepad1.left_trigger);
 //            }
+//
+//            double gyroAngle = 0;
+//            double magnitudeMultiplier = 0;
+//
+//
+////            ALL TRIG IS IN RADIANS
+//            double modifiedTheta = theta + Math.PI / 4 - gyroAngle;
+//
+//            double thetaInFirstQuad = Math.abs(Math.atan(stick_y / stick_x)); //square to circle conversion
+////            arctan is same as tan inverse
+//
+//            if (thetaInFirstQuad > Math.PI / 4) {
+//                magnitudeMultiplier = Math.sin(thetaInFirstQuad); //Works because we know y is 1 when theta > Math.pi/4
+//            } else if (thetaInFirstQuad <= Math.PI / 4) {
+//                magnitudeMultiplier = Math.cos(thetaInFirstQuad); //Works because we know x is 1 when theta < Math.pi/4
+//            }
+//
+//            double magnitude = Math.sqrt(Math.pow(stick_x, 2) + Math.pow(stick_y, 2)) * magnitudeMultiplier * (1 - Math.abs(pRot)); //Multiplied by (1-pRot) so it doesn't go over 1 with rotating
+//            pX = magnitude * Math.cos(modifiedTheta);
+//            pY = magnitude * Math.sin(modifiedTheta);
+//
+//            robo.mecanumDrive(pX, pY, -pRot);
+//        }
 
-//            ALL TRIG IS IN RADIANS
-                double modifiedTheta = theta + Math.PI / 4 - gyroAngle;
+        drive.setWeightedDrivePower(
+                new Pose2d(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x,
+                        //see if this last heading/rotation works
+                        gamepad1.right_trigger-gamepad1.left_trigger
+                )
+        );
 
-                double thetaInFirstQuad = Math.abs(Math.atan(stick_y / stick_x)); //square to circle conversion
-//            arctan is same as tan inverse
-
-                if (thetaInFirstQuad > Math.PI / 4) {
-                    magnitudeMultiplier = Math.sin(thetaInFirstQuad); //Works because we know y is 1 when theta > Math.pi/4
-                } else if (thetaInFirstQuad <= Math.PI / 4) {
-                    magnitudeMultiplier = Math.cos(thetaInFirstQuad); //Works because we know x is 1 when theta < Math.pi/4
-                }
-
-                double magnitude = Math.sqrt(Math.pow(stick_x, 2) + Math.pow(stick_y, 2)) * magnitudeMultiplier * (1 - Math.abs(pRot)); //Multiplied by (1-pRot) so it doesn't go over 1 with rotating
-                pX = magnitude * Math.cos(modifiedTheta);
-                pY = magnitude * Math.sin(modifiedTheta);
-
-                robo.mecanumDrive(pX, pY, -pRot);
-            }
-
-        }
 
     }
 
@@ -276,8 +243,8 @@ public class MainTeleOp extends LinearOpMode {
 
     public void launch() {
 //        check
-        if(toggleMap1.a) {
-            if (toggleMap1.left_bumper) {
+        if(toggleMap2.a) {
+            if (toggleMap1.left_bumper || toggleMap2.left_bumper) {
                 robo.launcher.setPower(.75);
                 telemetry.addData("Launcher:", "POWERSHOT MODE");
             } else {
@@ -301,28 +268,37 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     public void clawClose() {
+//        if(toggleMap2.b){
+//            robo.grasp.setPosition(.5);
+//            // closed
+//        }
+//        else {
+//            robo.grasp.setPosition(0);
+//            // open
+//        }
+
         if(toggleMap1.b){
             robo.grasp.setPosition(.5);
-            // closed more like opened
+            // closed
         }
         else {
             robo.grasp.setPosition(0);
-            // open more like closed
+            // open
         }
     }
 
     public void controlArm() {
-//        robo.arm.setPower(.4 * gamepad1.right_stick_y);
-        robo.arm.setPower(.5 * (gamepad1.right_trigger-gamepad1.left_trigger));
+        robo.arm.setPower(.4 * gamepad2.right_stick_y);
+//        robo.arm.setPower(.5 * (gamepad1.right_trigger-gamepad1.left_trigger));
     }
 
     public void intake() {
 //        check
-        if (toggleMap1.x) {
+        if (toggleMap2.x) {
             robo.intake1.setPower(1);
             robo.intake2.setPower(1);
             telemetry.addData("Intake:", "REVERSE");
-        } else if (toggleMap1.y){
+        } else if (toggleMap2.y){
             robo.intake1.setPower(-1);
             robo.intake2.setPower(-1);
             telemetry.addData("Intake:", "NORMAL");
@@ -385,7 +361,10 @@ public class MainTeleOp extends LinearOpMode {
             useMap1.y = runtime.milliseconds();
             toggleMap1.x = false;
         }
-
+        if(gamepad2.left_bumper && cdCheck(useMap2.left_bumper, 500)){
+            toggleMap2.left_bumper = toggle(toggleMap2.left_bumper);
+            useMap2.left_bumper = runtime.milliseconds();
+        }
         if (toggleMap1.right_bumper && cdCheck(useMap1.right_bumper, launchBuffer)) {
             toggleMap1.right_bumper = false;
             useMap1.right_bumper = runtime.milliseconds();
@@ -395,7 +374,24 @@ public class MainTeleOp extends LinearOpMode {
             toggleMap1.guide = toggle(toggleMap1.guide);
             useMap1.guide = runtime.milliseconds();
         }
-
+        if(gamepad2.b && cdCheck(useMap2.b, 500)){
+            toggleMap2.b = toggle(toggleMap2.b);
+            useMap2.b = runtime.milliseconds();
+        }
+        if(gamepad2.a && cdCheck(useMap2.a, 500)){
+            toggleMap2.a = toggle(toggleMap2.a);
+            useMap2.a = runtime.milliseconds();
+        }
+        if(gamepad2.x && cdCheck(useMap2.x, 500)){
+            toggleMap2.x = toggle(toggleMap2.x);
+            useMap2.x = runtime.milliseconds();
+            toggleMap2.y = false;
+        }
+        if(gamepad2.y && cdCheck(useMap2.y, 500)){
+            toggleMap2.y = toggle(toggleMap2.y);
+            useMap2.y = runtime.milliseconds();
+            toggleMap2.x = false;
+        }
 
 //        if(gamepad2.left_bumper){
 //            toggleMap1.left_bumper = false;
@@ -419,30 +415,4 @@ public class MainTeleOp extends LinearOpMode {
 
     }
 
-//    COPIED FROM ROVER RUCKUS
-//    public double getHeading(){ //Includes angle subtraction, angle to radian conversion, and 180>-180 to regular system conversion
-//        Orientation angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-//        double heading = angles.firstAngle;
-//        heading = (Math.PI/180)*heading;
-//        if(heading < 0){
-//            heading = (2*Math.PI) + heading;
-//        }
-//
-//        heading = heading - newZero;
-//
-//        heading += fullRotationCount*(2*Math.PI);
-//        return heading;
-//    }
-//
-//    public void angleOverflow(){ //Increase fullRotationCount when angle goes above 2*PI or below 0
-//        double heading = getHeading() - fullRotationCount*(2*Math.PI);
-//        //Warning: Will break if the robot does a 180 in less thank 1 tick, but that probably won't happen
-//        if(heading < Math.PI/2 && previousAngle > 3*Math.PI/2){
-//            fullRotationCount++;
-//        }
-//        if(heading > 3*Math.PI/2 && previousAngle < Math.PI/2){
-//            fullRotationCount--;
-//        }
-//        previousAngle = heading;
-//    }
 }

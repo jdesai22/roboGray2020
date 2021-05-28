@@ -10,9 +10,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 
-@TeleOp(name="dualMotorTest", group="Test")
-@Disabled
-public class DualMotorIntakeTest extends LinearOpMode{
+@TeleOp(name="NewIntakeTest", group="Test")
+public class NewIntakeTest extends LinearOpMode{
     private DcMotor intake1;
     private DcMotor intake2;
 
@@ -55,12 +54,16 @@ public class DualMotorIntakeTest extends LinearOpMode{
             intake1.setPower(1);
         } else if (gamepad1.b) {
             intake1.setPower(0);
+        } else if (gamepad1.x) {
+            intake1.setPower(-1);
         }
 
-        if (gamepad1.x) {
+        if (gamepad1.dpad_up) {
             intake2.setPower(1);
-        } else if (gamepad1.y) {
+        } else if (gamepad1.dpad_down) {
             intake2.setPower(0);
+        } else if (gamepad1.dpad_right) {
+            intake2.setPower(-1);
         }
     }
 

@@ -19,11 +19,12 @@ public class LaunchTest extends LinearOpMode {
 
     //    VARIABLES
     boolean launcherRunning = false;
+    boolean servoMoving = false;
 
 //    tune these constants
     double launchBuffer = 0.5;
-    double upServo = .5;
-    double bottomServo = .75;
+    final double upServo = .48;// originally .52
+    final double bottomServo = .83;
 
     @Override
     public void runOpMode() {
@@ -34,6 +35,8 @@ public class LaunchTest extends LinearOpMode {
         launcher.setDirection(DcMotor.Direction.FORWARD);
         launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        pusher.setPosition(bottomServo);
 
         while(opModeIsActive()){
             moveServo();
@@ -54,13 +57,19 @@ public class LaunchTest extends LinearOpMode {
 //        else if(gamepad1.right_bumper){
 //            pusher.setPosition(0);
 //        }
-        if (launchTime.seconds() - launchTime.startTime() > launchBuffer && gamepad1.right_trigger > 0.1 && launcherRunning && pusher.getPosition() == bottomServo) {
+        if (gamepad1.right_bumper && launchTime.milliseconds() >= 300 && !servoMoving) {
             pusher.setPosition(upServo);
+            servoMoving = true;
             launchTime.reset();
-        } else if (launchTime.seconds() - launchTime.startTime() > launchBuffer && pusher.getPosition() == upServo){
+        }
+
+        if (launchTime.milliseconds() >= 300 && servoMoving) {
             pusher.setPosition(bottomServo);
+            servoMoving = false;
+            launchTime.reset();
         }
     }
+
 
     public void launch() {
 //        if (gamepad1.a) {
@@ -69,11 +78,9 @@ public class LaunchTest extends LinearOpMode {
 //            launcher.setPower(0);
 //        }
         if(gamepad1.a) {
-            launcher.setPower(1);
-            launcherRunning = true;
+            launcher.setPower(.6);
         } else if (gamepad1.x){
             launcher.setPower(0);
-            launcherRunning = false;
         }
     }
 

@@ -68,7 +68,7 @@ public class fsmAutoZoneC extends LinearOpMode {
 //        check if need to break this into two diff trajectories
 
         Trajectory ZoneC = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(60.0, -40.0), 0.0)
+                .splineTo(new Vector2d(60.0, -43.0), 0.0)
                 .build();
 
         Trajectory MoveToLaunchArea = drive.trajectoryBuilder(ZoneC.end(), true)
@@ -80,7 +80,7 @@ public class fsmAutoZoneC extends LinearOpMode {
         Trajectory ZoneCReturn = drive.trajectoryBuilder(MoveToLaunchArea.end(), true)
                 //            .back(30.0)
 //                    pick up rings
-                .splineTo(new Vector2d(-30.0, -37.0), 0.0)
+                .splineTo(new Vector2d(-25.0, -37.0), Math.toRadians(180))
                 .build();
 
 //            shoot rings
@@ -98,7 +98,7 @@ public class fsmAutoZoneC extends LinearOpMode {
                 .build();
 
         Trajectory ZoneC2 = drive.trajectoryBuilder(ZoneC1.end())
-                .splineTo(new Vector2d(53.0, -40.0), 0.0)
+                .splineTo(new Vector2d(56.0, -40.0), 0.0)
                 .build();
 
         Trajectory ZoneCPark = drive.trajectoryBuilder(ZoneC2.end())
@@ -131,9 +131,9 @@ public class fsmAutoZoneC extends LinearOpMode {
                 case DropGoal1:
 
                     if (!drive.isBusy()) {
+                        sleep(500);
                         dropWobble(robo);
-
-                        sleep(250);
+                        sleep(500);
                         robo.launcher.setPower(1);
 
                         currentState = State.LaunchArea;
@@ -155,6 +155,7 @@ public class fsmAutoZoneC extends LinearOpMode {
                     if (!drive.isBusy()) {
                         shootRings(robo, 4);
 //                        sleep(250);
+                        resetDown(robo);
                         currentState = State.StartIntake;
                     }
 
@@ -178,10 +179,11 @@ public class fsmAutoZoneC extends LinearOpMode {
                 case SecondLaunch:
 
                     if (!drive.isBusy()) {
-                        robo.intake1.setPower(0);
-                        robo.intake2.setPower(0);
-                        robo.launcher.setPower(1);
+//                        robo.intake1.setPower(0);
+//                        robo.intake2.setPower(0);
 
+                        robo.launcher.setPower(1);
+                        sleep(500);
                         drive.followTrajectoryAsync(ZoneCReturn1);
                         currentState = State.LaunchArea2;
                     }
@@ -191,7 +193,7 @@ public class fsmAutoZoneC extends LinearOpMode {
                 case LaunchArea2:
 
                     if (!drive.isBusy()) {
-                        shootRings(robo, 4);
+                        shootRings(robo, 1);
 
                         currentState = State.StartIntake2;
                     }
@@ -200,7 +202,6 @@ public class fsmAutoZoneC extends LinearOpMode {
                     if (!drive.isBusy()) {
                         robo.intake1.setPower(-1);
                         robo.intake2.setPower(-1);
-
                         drive.followTrajectoryAsync(ZoneCReturn2);
                         currentState = State.RaiseGoal;
                     }
@@ -218,12 +219,13 @@ public class fsmAutoZoneC extends LinearOpMode {
 
                 case RaiseGoal:
                     if (!drive.isBusy()) {
-                        robo.intake1.setPower(0);
-                        robo.intake2.setPower(0);
+//                        robo.intake1.setPower(0);
+//                        robo.intake2.setPower(0);
 
                         sleep(250);
 
-                        raiseWobble(robo);
+//                        raiseWobble(robo);
+                        robo.grasp.setPosition(0);
 
                         robo.launcher.setPower(1);
 
@@ -243,10 +245,13 @@ public class fsmAutoZoneC extends LinearOpMode {
 ////
                 case LaunchArea3:
                     if (!drive.isBusy()) {
-
-                        shootRings(robo, 2);
+                        robo.intake1.setPower(0);
+                        robo.intake2.setPower(0);
+                        shootRings(robo, 4);
                         currentState = State.ZoneC3;
                     }
+
+                    break;
 
                 case ZoneC3:
                     if (!drive.isBusy()) {
@@ -257,9 +262,11 @@ public class fsmAutoZoneC extends LinearOpMode {
 
                 case DropGoal2:
                     if (!drive.isBusy()) {
-                        sleep(250);
-                        dropWobble(robo);
-                        sleep(250);
+//                        sleep(500);
+//                        dropWobble(robo);
+//                        sleep(500);
+
+                        robo.grasp.setPosition(.5);
                         currentState = State.Park;
                     }
                     break;
@@ -313,25 +320,59 @@ public class fsmAutoZoneC extends LinearOpMode {
     }
 
     public void raiseWobble(Ladle robo) {
+//        robo.grasp.setPosition(0.5);
+//        robo.arm.setPower(-.6);
+
+//        sleep(500);
+
         robo.grasp.setPosition(0);
 
         sleep(500);
-        //neg power = drop
-        robo.arm.setPower(-.55);
-        sleep(700);
+        robo.arm.setPower(-.65);
+        sleep(650);
         robo.arm.setPower(0);
 
     }
 
+
     public void dropWobble(Ladle robo) {
 
-        robo.arm.setPower(.4);
-        sleep(1000);
+//        robo.arm.setPower(.4);
+//        sleep(1000);
+//
+//        robo.arm.setPower(0);
+//        robo.grasp.setPosition(0.5);
+//
+//        sleep(500);
+//        robo.arm.setPower(0);
 
+//        sleep(500);
+
+
+//        sleep(500);
+
+
+        robo.arm.setPower(.5);
+        sleep(600);
 
         robo.arm.setPower(0);
         robo.grasp.setPosition(0.5);
 
+        sleep(700);
 
+        resetUp(robo);
+
+    }
+
+    public void resetUp(Ladle robo) {
+        robo.arm.setPower(-.65);
+        sleep(350);
+        robo.arm.setPower(0);
+    }
+
+    public void resetDown(Ladle robo) {
+        robo.arm.setPower(.65);
+        sleep(500);
+        robo.arm.setPower(0);
     }
 }

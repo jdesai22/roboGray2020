@@ -12,7 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
 @TeleOp
-public class RingContourTest extends LinearOpMode {
+public class QuickImageRec extends LinearOpMode {
     private static final int CAMERA_WIDTH = 320; // width  of wanted camera resolution
     private static final int CAMERA_HEIGHT = 240; // height of wanted camera resolution
 
@@ -63,18 +63,19 @@ public class RingContourTest extends LinearOpMode {
 
         FtcDashboard.getInstance().startCameraStream(camera, 30);
 
-        String height = "" + pipeline.getHeight();
+
         waitForStart();
 
-        if (isStopRequested()) return;
-
-
         while (opModeIsActive()) {
-            String ht = "[HEIGHT]" + " " + pipeline.getHeight();
-            telemetry.addData("[Ring Stack] built in >>", ht);
-            telemetry.addData("Test height", height);
+
+            String height = " " + pipeline.getHeight();
+            telemetry.addData("[Ring Stack] >>", height);
+
+
 
             telemetry.update();
+
+
         }
     }
 }

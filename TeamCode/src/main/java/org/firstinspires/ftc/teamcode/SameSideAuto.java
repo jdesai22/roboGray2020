@@ -27,8 +27,9 @@ import org.firstinspires.ftc.teamcode.roadRunnerTuner.drive.SampleMecanumDrive;
 import java.util.ArrayList;
 
 
-@Autonomous(name = "auto", group = "Important")
-public class Auto extends LinearOpMode {
+@Autonomous(name = "updated same side auto", group = "Important")
+@Disabled
+public class SameSideAuto extends LinearOpMode {
 
 
     //CAMERA
@@ -47,13 +48,11 @@ public class Auto extends LinearOpMode {
 
     private int cameraMonitorViewId;
 
-
-
     // ROADRUNNER AND VARIABLES
-    Pose2d startPose = new Pose2d(-62.0, -18.0, 0.0);
+    Pose2d startPose = new Pose2d(-62.0, -34.0, Math.toRadians(180));
 
-    final double upServo = .48;
-    final double bottomServo = .83;
+    final double upServo = .53;// originally .52
+    final double bottomServo = .89;
 
     boolean servoMoving = false;
 
@@ -136,115 +135,92 @@ public class Auto extends LinearOpMode {
 
         // ZONE A
 
-        Trajectory MoveToLaunchAreaA = drive.trajectoryBuilder(startPose)
+        Trajectory MoveToLaunchAreaA = drive.trajectoryBuilder(startPose, true)
 //                .forward(40.0)
-                .splineTo(new Vector2d(-0.5, -34.0), 0.0)
+                .lineToSplineHeading(new Pose2d(-0.5, -34.0, Math.toRadians(180)))
                 .build();
 
-        Trajectory ZoneA = drive.trajectoryBuilder(MoveToLaunchAreaA.end())
-                .lineToSplineHeading(new Pose2d(19.0, -40.0, 0.0))
+        Trajectory ZoneA = drive.trajectoryBuilder(MoveToLaunchAreaA.end(), true)
+                .lineToSplineHeading(new Pose2d(19.0, -40.0, Math.toRadians(180)))
                 .build();
 
-        Trajectory ZoneAReturn = drive.trajectoryBuilder(ZoneA.end(), true)
+        Trajectory ZoneAReturn = drive.trajectoryBuilder(ZoneA.end())
 //                .splineTo(new Vector2d(0.0, -40.0), 0.0)
 //                .splineTo(new Vector2d(-45.0, -36.5), Math.toRadians(180))
-                .splineTo(new Vector2d(-45.0, -34.5), Math.toRadians(180))
+                .splineTo(new Vector2d(-45.0, -34.5), 0.0)
                 .addDisplacementMarker(10, () -> {
                     resetDown(robo);
                 })
                 .build();
 
-        Trajectory ZoneA1 = drive.trajectoryBuilder(ZoneAReturn.end())
-                .splineTo(new Vector2d(10.0, -40.0), 0.0)
+        Trajectory ZoneA1 = drive.trajectoryBuilder(ZoneAReturn.end(), true)
+                .splineTo(new Vector2d(10.0, -40.0), Math.toRadians(180))
                 .build();
 
         // ZONE B
 
-        Trajectory ZoneB = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(43.0, -20.0), 0.0)
-                .build();
-
-        Trajectory MoveToLaunchAreaB = drive.trajectoryBuilder(ZoneB.end(), true)
+        Trajectory MoveToLaunchAreaB = drive.trajectoryBuilder(startPose, true)
 //                .forward(40.0)
-                .splineTo(new Vector2d(30.0, -20.0), Math.toRadians(180))
-                .splineTo(new Vector2d(-0.5, -34.0), Math.toRadians(180))
+                .lineToSplineHeading(new Pose2d(-37.0, -34.0, Math.toRadians(180)))
                 .build();
 
-        Trajectory ZoneBReturn1 = drive.trajectoryBuilder(ZoneB.end(), true)
-//                .splineTo(new Vector2d(30.0, -20.0), Math.toRadians(180))
-//                .splineTo(new Vector2d(0.0, -37.0), Math.toRadians(180))
+        // shoot 3
+
+        Trajectory LaunchAreaB2 = drive.trajectoryBuilder(MoveToLaunchAreaA.end(), true)
+                .lineToSplineHeading(new Pose2d(-0.5, -34.0, Math.toRadians(180)))
                 .build();
 
-        //            Trajectory ZoneBReturn2 = drive.trajectoryBuilder(ZoneBReturn1.end())
-//                    .strafeRight(17.0)
-//                    .build();
-
-//            slow this down to pick up rings
-
-        Trajectory ZoneBReturn3 = drive.trajectoryBuilder(MoveToLaunchAreaB.end(), true)
-                // is this right direciton even w/reversed = true
-//                .back(30.0) CHECK THIS
-                .splineTo(new Vector2d(-45.0, -33.5), Math.toRadians(180))
+        Trajectory ZoneB = drive.trajectoryBuilder(LaunchAreaB2.end(), true)
+                .lineToSplineHeading(new Pose2d(43.0, -20.0, Math.toRadians(180)))
                 .build();
 
-        Trajectory ZoneB1 = drive.trajectoryBuilder(ZoneBReturn3.end())
-                .splineTo(new Vector2d(-0.2, -34.0), 0.0)
-                .build();
-//           shoot 1 ring on the way
+        Trajectory ZoneBReturn3 = drive.trajectoryBuilder(MoveToLaunchAreaB.end())
 
-        Trajectory ZoneB2 = drive.trajectoryBuilder(ZoneB1.end())
-                .splineTo(new Vector2d(36.0, -20.0), 0.0)
+                .splineTo(new Vector2d(-45.0, -33.5), 0.0)
+                .build();
+
+
+        Trajectory ZoneB2 = drive.trajectoryBuilder(ZoneBReturn3.end(), true)
+                .splineTo(new Vector2d(36.0, -20.0), Math.toRadians(180))
                 .build();
 
         Trajectory ZoneBPark = drive.trajectoryBuilder(ZoneB2.end())
-                .back(20.0)
+                .forward(20.0)
                 .build();
 
 
         // ZONE C
 
-        Trajectory ZoneC = drive.trajectoryBuilder(startPose)
-//                .splineTo(new Vector2d(60.0, -40.0), 0.0)
-                .forward(40)
-//                .splineTo(new Vector2d(50.0, -10.0), 0.0)
-                .splineTo(new Vector2d(60.0, -45.0), 0.0)
 
-                .build();
-
-        Trajectory MoveToLaunchAreaC = drive.trajectoryBuilder(ZoneC.end(), true)
+        Trajectory MoveToLaunchAreaC = drive.trajectoryBuilder(startPose, true)
 //                .forward(40.0)
 //                .splineTo(new Vector2d(30.0, -20.0), Math.toRadians(180))
-                .splineTo(new Vector2d(-0.2, -33.0), Math.toRadians(180))
+                .lineToSplineHeading(new Pose2d(-37.0, -34.0, Math.toRadians(180)))
                 .build();
 
-        Trajectory ZoneCReturn = drive.trajectoryBuilder(MoveToLaunchAreaC.end(), true)
-                //            .back(30.0)
-//                    pick up rings
-                .splineTo(new Vector2d(-29.0, -35.0), Math.toRadians(180))
+        Trajectory MoveToLaunchAreaC2 = drive.trajectoryBuilder(MoveToLaunchAreaC.end(), true)
+                .lineToSplineHeading(new Pose2d(-25.0, -34.0, Math.toRadians(180)))
                 .build();
 
-//            shoot rings
-        Trajectory ZoneCReturn1 = drive.trajectoryBuilder(ZoneCReturn.end())
-                .splineTo(new Vector2d(-0.5, -33.0), 0.0)
-                .addDisplacementMarker(6, () -> {
-                    robo.launcher.setPower(1);
-                })
+        Trajectory MoveToLaunchAreaC3 = drive.trajectoryBuilder(MoveToLaunchAreaC2.end(), true)
+                .lineToSplineHeading(new Pose2d(-0.5, -34.0, Math.toRadians(180)))
                 .build();
+
+        Trajectory ZoneC = drive.trajectoryBuilder(MoveToLaunchAreaC.end(), true)
+//                .splineTo(new Vector2d(60.0, -40.0), 0.0)
+//                .splineTo(new Vector2d(50.0, -10.0), 0.0)
+                .splineTo(new Vector2d(60.0, -45.0), Math.toRadians(180))
+                .build();
+
 
 //            pick up final ring
-        Trajectory ZoneCReturn2 = drive.trajectoryBuilder(ZoneCReturn1.end(), true)
-                .splineTo(new Vector2d(-45.0, -34.5), Math.toRadians(180))
+        Trajectory ZoneCReturn2 = drive.trajectoryBuilder(ZoneC.end())
+                .splineTo(new Vector2d(-45.0, -34.5), 0.0)
                 .build();
+        
 
-        Trajectory ZoneC1 = drive.trajectoryBuilder(ZoneCReturn2.end())
-                .splineTo(new Vector2d(-0.5, -33.0), 0.0)
-                .addDisplacementMarker(5, () -> {
-                    robo.launcher.setPower(1);
-                })
-                .build();
-
-        Trajectory ZoneC2 = drive.trajectoryBuilder(ZoneC1.end())
-                .splineTo(new Vector2d(56.0, -40.0), 0.0)
+        Trajectory ZoneC2 = drive.trajectoryBuilder(ZoneCReturn2.end(), true)
+                .splineTo(new Vector2d(56.0, -40.0), Math.toRadians(180))
                 .build();
 
         Trajectory ZoneCPark = drive.trajectoryBuilder(ZoneC2.end())
@@ -306,6 +282,7 @@ public class Auto extends LinearOpMode {
             switch (height){
                 case "ZERO":
                     currentStateA = StateA.Shoot;
+                    robo.platformUp();
                     drive.followTrajectoryAsync(MoveToLaunchAreaA);
 
                     while (opModeIsActive() && !isStopRequested()) {
@@ -430,136 +407,99 @@ public class Auto extends LinearOpMode {
 
                 case "ONE":
 
-                    currentStateB = StateB.DropGoal1;
-                    drive.followTrajectoryAsync(ZoneB);
+                    currentStateB = StateB.LaunchArea;
+                    robo.platformUp();
+                    drive.followTrajectoryAsync(MoveToLaunchAreaB);
 
                     while (opModeIsActive() && !isStopRequested()) {
-                        // Our state machine logic
-                        // You can have multiple switch statements running together for multiple state machines
-                        // in parallel. This is the basic idea for subsystems and commands.
-
-                        // We essentially define the flow of the state machine through this switch statement
                         switch (currentStateB) {
-
-
-//                    break;
-
-                            case DropGoal1:
+                            case LaunchArea:
 
                                 if (!drive.isBusy()) {
-                                    sleep(500);
-                                    zoneBDropWobble(robo);
-                                    sleep(500);
-                                    robo.launcher.setPower(1);
-                                    currentStateB = StateB.LaunchArea;
+                                    shootRings(robo, 4);
+
+                                    currentStateB = StateB.ContinueToPickup;
                                 }
                                 break;
 
-
-                            case LaunchArea:
+                            case ContinueToPickup:
                                 // Check if the drive class isn't busy
                                 // `isBusy() == true` while it's following the trajectory
                                 // Once `isBusy() == false`, the trajectory follower signals that it is finished
                                 // We move on to the next state
                                 // Make sure we use the async follow function
                                 if (!drive.isBusy()) {
-                                    drive.followTrajectoryAsync(MoveToLaunchAreaB);
-                                    currentStateB = StateB.Shoot;
-                                }
-
-                                break;
-
-                            case Shoot:
-
-                                if (!drive.isBusy()) {
-                                    shootRings(robo, 4);
-//                        sleep(250);
-                                    resetDown(robo);
-                                    currentStateB = StateB.StartIntake;
-                                }
-
-                                break;
-                            case StartIntake:
-                                if (!drive.isBusy()) {
+                                    robo.platformDown();
                                     robo.intake1.setPower(-1);
-                                    robo.intake2.setPower(-1);
-//                        sleep(250);
-                                    currentStateB = StateB.ContinueToPickup;
-                                }
-                                break;
-
-                            case ContinueToPickup:
-                                if (!drive.isBusy()) {
-                                    drive.followTrajectoryAsync(ZoneBReturn3);
-                                    currentStateB = StateB.RaiseGoal;
-                                }
-                                break;
-
-//                case ZoneB:
-//                    // Check if the drive class is busy following the trajectory
-//
-//                    if (!drive.isBusy()) {
-//                        drive.followTrajectoryAsync(ZoneBReturn1);
-//                        currentState = State.StartIntake;
-//                    }
-//
-//                    break;
-
-
-//                case StopIntake:
-//                    if (!drive.isBusy()) {
-//                        robo.intake1.setPower(0);
-//                        robo.intake2.setPower(0);
-////                        sleep(250);
-//                        currentState = State.RaiseGoal;
-//                    }
-//                    break;
-                            case RaiseGoal:
-                                if (!drive.isBusy()) {
-                                    robo.intake1.setPower(0);
-                                    robo.intake2.setPower(0);
-
-                                    sleep(250);
-
-                                    raiseWobble(robo);
-
-                                    currentStateB = StateB.ZoneB2;
-
-                                    sleep(250);
-
-                                }
-
-                                break;
-//
-                            case ZoneB2:
-
-                                if (!drive.isBusy()) {
-                                    drive.followTrajectoryAsync(ZoneB1);
-                                    robo.launcher.setPower(1);
+                                    robo.intake2.setPower(1);
+                                    drive.followTrajectoryAsync(LaunchAreaB2);
                                     currentStateB = StateB.SecondLaunch;
                                 }
-
                                 break;
-////
+
                             case SecondLaunch:
 
                                 if (!drive.isBusy()) {
+                                    robo.intake1.setPower(0);
+                                    robo.intake2.setPower(0);
+                                    robo.platformUp();
 
+                                    shootRings(robo, 2);
 //                        sleep(250);
-//                        currentState = State.RaiseGoal;
-                                    shootRings(robo, 1);
-                                    currentStateB = StateB.ZoneB3;
+                                    currentStateB = StateB.ZoneB;
                                 }
 
                                 break;
-                            case ZoneB3:
+                            case ZoneB:
+
+                                if (!drive.isBusy()) {
+                                    drive.followTrajectoryAsync(ZoneB);
+                                    currentStateB = StateB.DropGoal1;
+                                }
+                                break;
+
+                            case DropGoal1:
+
+                                if (!drive.isBusy()) {
+                                    sleep(500);
+
+                                    dropWobble(robo);
+
+                                    sleep(750);
+                                    currentStateB = StateB.ZoneB2;
+                                }
+                                break;
+
+
+                            case ZoneB2:
                                 if (!drive.isBusy()) {
 
-                                    drive.followTrajectoryAsync(ZoneB2);
-                                    currentStateB = StateB.DropGoal2;
+                                    drive.followTrajectoryAsync(ZoneBReturn3);
 
+                                    currentStateB = StateB.RaiseGoal;
+                                }
+
+                                break;
+
+                            case RaiseGoal:
+                                if (!drive.isBusy()) {
+
+                                    sleep(250);
+                                    raiseWobble(robo);
+                                    sleep(500);
+
+                                    currentStateB = StateB.ZoneB3;
                                 }
                                 break;
+
+                            case ZoneB3:
+
+                                if (!drive.isBusy()) {
+                                    drive.followTrajectoryAsync(ZoneB2);
+                                    currentStateB = StateB.ZoneB3;
+                                }
+                                break;
+
                             case DropGoal2:
                                 if (!drive.isBusy()) {
                                     sleep(500);
@@ -568,6 +508,7 @@ public class Auto extends LinearOpMode {
                                     currentStateB = StateB.Park;
                                 }
                                 break;
+
                             case Park:
                                 if (!drive.isBusy()) {
                                     drive.followTrajectoryAsync(ZoneBPark);
@@ -588,31 +529,23 @@ public class Auto extends LinearOpMode {
 
                 case "FOUR":
 
-                    currentStateC = StateC.DropGoal1;
-                    drive.followTrajectoryAsync(ZoneC);
-
+                    currentStateC = StateC.Shoot;
+                    robo.platformUp();
+                    drive.followTrajectoryAsync(MoveToLaunchAreaC);
 
                     while (opModeIsActive() && !isStopRequested()) {
-                        // Our state machine logic
-                        // You can have multiple switch statements running together for multiple state machines
-                        // in parallel. This is the basic idea for subsystems and commands.
 
-                        // We essentially define the flow of the state machine through this switch statement
                         switch (currentStateC) {
 
-
-//                    break;
-
-                            case DropGoal1:
+                            case Shoot:
 
                                 if (!drive.isBusy()) {
-                                    sleep(500);
-                                    dropWobble(robo);
-                                    sleep(500);
-                                    robo.launcher.setPower(1);
-
-                                    currentStateC = StateC.LaunchArea;
+                                    shootRings(robo, 4);
+//                        sleep(250);
+                                    resetDown(robo);
+                                    currentStateC = StateC.StartIntake;
                                 }
+
                                 break;
 
 
@@ -625,16 +558,6 @@ public class Auto extends LinearOpMode {
 
                                 break;
 
-                            case Shoot:
-
-                                if (!drive.isBusy()) {
-                                    shootRings(robo, 4);
-//                        sleep(250);
-                                    resetDown(robo);
-                                    currentStateC = StateC.StartIntake;
-                                }
-
-                                break;
                             case StartIntake:
                                 if (!drive.isBusy()) {
                                     robo.intake1.setPower(-1);
@@ -646,7 +569,7 @@ public class Auto extends LinearOpMode {
 
                             case ContinueToPickup:
                                 if (!drive.isBusy()) {
-                                    drive.followTrajectoryAsync(ZoneCReturn);
+//                                    drive.followTrajectoryAsync(ZoneCReturn);
                                     currentStateC = StateC.SecondLaunch;
                                 }
                                 break;
@@ -659,7 +582,7 @@ public class Auto extends LinearOpMode {
 
                                     robo.launcher.setPower(0);
 //                                    sleep(500);
-                                    drive.followTrajectoryAsync(ZoneCReturn1);
+//                                    drive.followTrajectoryAsync(ZoneCReturn1);
                                     currentStateC = StateC.LaunchArea2;
                                 }
 
@@ -711,10 +634,23 @@ public class Auto extends LinearOpMode {
                                 }
 
                                 break;
+
+                            case DropGoal1:
+
+                                if (!drive.isBusy()) {
+                                    sleep(500);
+                                    dropWobble(robo);
+                                    sleep(500);
+                                    robo.launcher.setPower(1);
+
+                                    currentStateC = StateC.LaunchArea;
+                                }
+                                break;
+
 //
                             case ZoneC2:
                                 if (!drive.isBusy()) {
-                                    drive.followTrajectoryAsync(ZoneC1);
+//                                    drive.followTrajectoryAsync(ZoneC1);
 //                        robo.launcher.setPower(1);
                                     currentStateC = StateC.LaunchArea3;
                                 }
